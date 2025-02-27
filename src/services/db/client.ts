@@ -2,9 +2,10 @@
 
 import { PrismaClient } from "@prisma/client";
 import { DBService } from "./interface"; // or the same file if you prefer
-import { Artefact, ArtefactId } from "../../app/types/artefact";
-import { Scene, SceneId } from "../../app/types/scene";
-import { Experience, ExperienceId } from "../../app/types/experience";
+import { Artefact, ArtefactId } from "../../types/artefact";
+import { Scene, SceneId } from "../../types/scene";
+import { Experience, ExperienceId } from "../../types/experience";
+import { Embedding, EmbeddingId } from "@/types/embedding";
 
 const prisma = new PrismaClient();
 
@@ -72,5 +73,24 @@ export const dbService: DBService = {
   },
   deleteExperience: async (id: ExperienceId): Promise<Experience> => {
     return prisma.experience.delete({ where: { id } });
+  },
+
+  // ───────────────────────────────────────────────────────────────────
+  // EMBEDDING
+  // ───────────────────────────────────────────────────────────────────
+
+  createEmbedding: async (data: Omit<Embedding, "id">): Promise<Embedding> => {
+    return prisma.embedding.create({ data });
+  },
+  getEmbeddingById: async (id: EmbeddingId): Promise<Embedding | null> => {
+    return prisma.embedding.findUnique({ where: { id } });
+  },
+  getAllEmbeddings: async (): Promise<Embedding[]> => {
+    return prisma.embedding.findMany();
+  },
+  getEmbeddingByArtefactId: async (
+    artefactId: ArtefactId
+  ): Promise<Embedding | null> => {
+    return prisma.embedding.findFirst({ where: { artefactId } });
   },
 };

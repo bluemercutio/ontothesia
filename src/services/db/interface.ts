@@ -1,9 +1,9 @@
 // src/services/dbService.ts
 
-import { ArtefactId, Artefact } from "../../app/types/artefact";
-import { Scene, SceneId } from "../../app/types/scene";
-import { Experience, ExperienceId } from "../../app/types/experience";
-
+import { ArtefactId, Artefact } from "../../types/artefact";
+import { Scene, SceneId } from "../../types/scene";
+import { Experience, ExperienceId } from "../../types/experience";
+import { Embedding, EmbeddingId } from "../../types/embedding";
 // Because Prisma autogenerates an ID by default, we can use Omit<*, "id"> when creating new records.
 // For update methods, we accept a Partial of the entity so you can update any subset of fields.
 
@@ -37,4 +37,12 @@ export interface DBService {
     data: Partial<Experience>
   ): Promise<Experience>;
   deleteExperience(id: ExperienceId): Promise<Experience>;
+
+  // ───────────────────────────────────────────────────────────────────
+  // EMBEDDING
+  // ───────────────────────────────────────────────────────────────────
+  createEmbedding(data: Omit<Embedding, "id">): Promise<Embedding>;
+  getEmbeddingById(id: EmbeddingId): Promise<Embedding | null>;
+  getAllEmbeddings(): Promise<Embedding[]>;
+  getEmbeddingByArtefactId(artefactId: ArtefactId): Promise<Embedding | null>;
 }

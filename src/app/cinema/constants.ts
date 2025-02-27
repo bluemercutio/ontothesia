@@ -1,4 +1,4 @@
-import { DomeLayerConfig } from "../types";
+import { DomeLayerConfig } from "../../types";
 
 // Define your "layers" (example config)
 export const domeLayers: DomeLayerConfig[] = [

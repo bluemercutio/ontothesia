@@ -1,3 +1,5 @@
+import { EmbeddingId } from "./embedding";
+
 export type ArtefactId = string;
 
 export interface Artefact {
@@ -7,4 +9,5 @@ export interface Artefact {
   region: string;
   approx_date: string;
   citation: string;
+  embedding: EmbeddingId;
 }

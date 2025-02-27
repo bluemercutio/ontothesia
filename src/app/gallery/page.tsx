@@ -4,7 +4,7 @@ import React from "react";
 import Card from "@/components/Card";
 import Carousel from "@/components/Carousel";
 import NavbarWrapper from "@/components/NavbarWrapper";
-import { Experience } from "../types/experience";
+import { Experience } from "../../types/experience";
 
 const experiences: Experience[] = [
   {
@@ -23,13 +23,13 @@ export default function Gallery() {
         <div className="flex-1 flex flex-col justify-center items-center min-h-screen">
           <h1 className="text-4xl font-bold text-center mb-8">Gallery</h1>
           <Carousel>
-            {experiences.map((item, index) => (
+            {experiences.map((item) => (
               <Card
-                key={index}
+                key={item.id}
                 title={item.title}
                 description={item.description}
                 imageUrl={item.image_url}
-                width="w-1/2"
+                width="w-64"
               />
             ))}
           </Carousel>

@@ -1,6 +1,6 @@
-import { Artefact } from "../src/app/types/artefact";
+import { Artefact } from "../src/types/artefact";
 
-export const artefacts: Artefact[] = [
+export const artefacts: Partial<Artefact>[] = [
   {
     id: "1",
     title: "Hymn to the Nile",

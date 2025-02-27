@@ -30,12 +30,20 @@ model Scene {
 }
 
 model Artefact {
-  id          String     @id @default(uuid())
+  id          String    @id
   title       String
   text        String
   region      String
   approx_date String
   citation    String
-  // Many-to-many relationship back to Scene
-  scenes      Scene[]    @relation("SceneToArtefact")
+  scenes      Scene[]   @relation("SceneToArtefact")
+  embedding   Embedding?
+}
+
+model Embedding {
+  id         String   @id
+  text       String
+  vector     Float[]
+  artefact   Artefact @relation(fields: [artefactId], references: [id])
+  artefactId String   @unique
 }

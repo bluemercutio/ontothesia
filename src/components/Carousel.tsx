@@ -21,7 +21,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
   };
 
   return (
-    <div className="relative mx-auto">
+    <div className="relative mx-auto border">
       <div className="overflow-hidden">
         <div
           className="transition-transform duration-300 ease-in-out flex"
