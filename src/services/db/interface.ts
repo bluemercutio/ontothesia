@@ -1,0 +1,40 @@
+// src/services/dbService.ts
+
+import { ArtefactId, Artefact } from "../../app/types/artefact";
+import { Scene, SceneId } from "../../app/types/scene";
+import { Experience, ExperienceId } from "../../app/types/experience";
+
+// Because Prisma autogenerates an ID by default, we can use Omit<*, "id"> when creating new records.
+// For update methods, we accept a Partial of the entity so you can update any subset of fields.
+
+export interface DBService {
+  // ───────────────────────────────────────────────────────────────────
+  // ARTEFACT
+  // ───────────────────────────────────────────────────────────────────
+  createArtefact(data: Omit<Artefact, "id">): Promise<Artefact>;
+  getArtefactById(id: ArtefactId): Promise<Artefact | null>;
+  getAllArtefacts(): Promise<Artefact[]>;
+  updateArtefact(id: ArtefactId, data: Partial<Artefact>): Promise<Artefact>;
+  deleteArtefact(id: ArtefactId): Promise<Artefact>;
+
+  // ───────────────────────────────────────────────────────────────────
+  // SCENE
+  // ───────────────────────────────────────────────────────────────────
+  createScene(data: Omit<Scene, "id">): Promise<Scene>;
+  getSceneById(id: SceneId): Promise<Scene | null>;
+  getAllScenes(): Promise<Scene[]>;
+  updateScene(id: SceneId, data: Partial<Scene>): Promise<Scene>;
+  deleteScene(id: SceneId): Promise<Scene>;
+
+  // ───────────────────────────────────────────────────────────────────
+  // EXPERIENCE
+  // ───────────────────────────────────────────────────────────────────
+  createExperience(data: Omit<Experience, "id">): Promise<Experience>;
+  getExperienceById(id: ExperienceId): Promise<Experience | null>;
+  getAllExperiences(): Promise<Experience[]>;
+  updateExperience(
+    id: ExperienceId,
+    data: Partial<Experience>
+  ): Promise<Experience>;
+  deleteExperience(id: ExperienceId): Promise<Experience>;
+}
