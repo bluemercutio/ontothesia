@@ -5,28 +5,78 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary-bg: #f5f5f7;
+  --primary-bg-hover: #e5e5e7;
+  
+  /* Scrollbar colors */
+  --scrollbar-thumb: #a0a0a0;
+  --scrollbar-thumb-hover: #808080;
+  --scrollbar-track: rgba(0, 0, 0, 0.05);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #000000;
     --foreground: #ededed;
+    --primary-bg: #1c1c1e;
+    --primary-bg-hover: #414149;
+    
+    /* Dark mode scrollbar colors */
+    --scrollbar-thumb: #4a4a4a;
+    --scrollbar-thumb-hover: #5a5a5a;
+    --scrollbar-track: rgba(255, 255, 255, 0.05);
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--kanit), Arial, Helvetica, sans-serif;
 }
 
-
-:root {
-  --card-bg: #f8f9fa;
+/* Custom Scrollbar Styles */
+/* For Webkit browsers (Chrome, Safari, newer versions of Opera) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --card-bg: #1c1c1e;
-  }
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* For Edge and IE */
+*::-ms-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-ms-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+*::-ms-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+*::-ms-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }

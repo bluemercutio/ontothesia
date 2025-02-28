@@ -1,64 +1,44 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams } from "next/navigation";
-import { Artefact as ArtefactType } from "@/types/artefact";
-import NavbarWrapper from "@/components/NavbarWrapper";
 import { Network } from "@/components/Network";
-import { Embedding } from "@/types/embedding";
-import { EmbeddingNetwork } from "@/services/graph/interface";
+import { useGetArtefactByIdQuery, useGetEmbeddingsQuery } from "@/store/api";
 import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
+import Link from "next/link";
 
 export default function ArtefactPage() {
   const params = useParams();
-  const [artefact, setArtefact] = useState<ArtefactType | null>(null);
-  const [embedding, setEmbedding] = useState<Embedding | null>(null);
+  const id = params?.id;
 
-  const [directedEmbeddingNetwork, setDirectedEmbeddingNetwork] =
-    useState<EmbeddingNetwork | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  console.log("PARAMS", params);
 
-  useEffect(() => {
-    const fetchArtefactAndEmbedding = async () => {
-      try {
-        const artefactResponse = fetch(`/api/artefacts/${params.id}`);
-        const embeddingResponse = fetch(
-          `/api/embeddings/${params.id}/${params.id}`
-        );
-        const [artefact, embedding] = await Promise.all([
-          await artefactResponse,
-          await embeddingResponse,
-        ]);
-        if (!artefact.ok || !embedding.ok) {
-          throw new Error("Artefact or embedding not found");
-        }
-        const artefactData = await artefact.json();
-        const embeddingData = await embedding.json();
-        setArtefact(artefactData);
-        setEmbedding(embeddingData);
-        //fetch all embeddings
-        const embeddingsResponse = await fetch(`/api/embeddings`);
-        const embeddingsData = await embeddingsResponse.json();
-        const THRESHOLD = 0.8;
-        const directedEmbeddingNetwork = buildDirectedNetwork(
-          embeddingData,
-          embeddingsData,
-          3,
-          THRESHOLD
-        );
-        setDirectedEmbeddingNetwork(directedEmbeddingNetwork);
-      } catch (error) {
-        setError(
-          error instanceof Error ? error.message : "Failed to fetch artefact"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Use RTK Query hooks
+  const {
+    data: artefact,
+    isLoading: artefactLoading,
+    error: artefactError,
+  } = useGetArtefactByIdQuery(typeof id === "string" ? id : "");
 
-    fetchArtefactAndEmbedding();
-  }, [params.id]);
+  const { data: embeddings, isLoading: embeddingsLoading } =
+    useGetEmbeddingsQuery();
+
+  console.log("ARTEFACT", artefact);
+  console.log("EMBEDDINGS", embeddings);
+
+  // Build the network when data is available
+  const directedEmbeddingNetwork = React.useMemo(() => {
+    if (!artefact || !embeddings) return null;
+
+    // Find the embedding for this artefact
+    const embedding = embeddings.find((e) => e.id === `${id}-embedding`);
+    if (!embedding) return null;
+
+    const THRESHOLD = 0.8;
+    return buildDirectedNetwork(embedding, embeddings, 3, THRESHOLD);
+  }, [artefact, embeddings, id]);
+
+  const isLoading = artefactLoading || embeddingsLoading;
 
   if (isLoading) {
     return (
@@ -68,15 +48,18 @@ export default function ArtefactPage() {
     );
   }
 
-  if (error || !artefact || !embedding) {
-    console.log("error", error);
-    console.log("artefact", artefact);
-    console.log("embedding", embedding);
+  if (artefactError || !artefact) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-red-500">
-          {error || "Artefact or embedding not found"}
+          {artefactError ? "Error loading artefact" : "Artefact not found"}
         </p>
+        <Link
+          href="/library"
+          className="text-blue-500 hover:text-blue-700 underline ml-2"
+        >
+          Return to Library
+        </Link>
       </div>
     );
   }
@@ -86,7 +69,7 @@ export default function ArtefactPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div
-            style={{ background: "var(--card-bg)" }}
+            style={{ background: "var(--primary-bg)" }}
             className="rounded-xl shadow-lg p-6 mb-6"
           >
             <h1 className="text-4xl font-bold mb-4">{artefact.title}</h1>
@@ -113,7 +96,7 @@ export default function ArtefactPage() {
           </div>
 
           <div
-            style={{ background: "var(--card-bg)" }}
+            style={{ background: "var(--primary-bg)" }}
             className="rounded-xl shadow-lg p-6"
           >
             <h2 className="text-xl font-semibold mb-4">Text</h2>
@@ -124,7 +107,7 @@ export default function ArtefactPage() {
 
           {directedEmbeddingNetwork && (
             <div
-              style={{ background: "var(--card-bg)" }}
+              style={{ background: "var(--primary-bg)" }}
               className="mt-6 shadow-lg p-6 rounded-md relative"
             >
               <div className="z-10">
@@ -133,7 +116,7 @@ export default function ArtefactPage() {
                 </h4>
                 <Network
                   data={directedEmbeddingNetwork}
-                  startingNode={`${params.id}-embedding`}
+                  startingNode={`${id}-embedding`}
                   width={896}
                   height={600}
                 />
@@ -142,7 +125,6 @@ export default function ArtefactPage() {
           )}
         </div>
       </div>
-      <NavbarWrapper />
     </div>
   );
 }

@@ -1,12 +1,14 @@
+import { NextRequest, NextResponse } from "next/server";
 import { dbService } from "@/services/db/client";
-import { NextResponse } from "next/server";
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const artefact = await dbService.getArtefactById(params.id);
+    // Await params before accessing its properties
+    const { id } = await params;
+    const artefact = await dbService.getArtefactById(id);
 
     if (!artefact) {
       return NextResponse.json(
@@ -17,8 +19,9 @@ export async function GET(
 
     return NextResponse.json(artefact);
   } catch (error) {
+    console.error("Error fetching artefact:", error);
     return NextResponse.json(
-      { error: `Failed to fetch artefact: ${error}` },
+      { error: "Failed to fetch artefact" },
       { status: 500 }
     );
   }

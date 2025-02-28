@@ -5,8 +5,9 @@ export type SceneId = string;
 export interface Scene {
   id: SceneId;
   title: string;
-  description: string;
-  artefacts: ArtefactId[];
+  context: string;
+  artefact: ArtefactId;
   image_url: string;
   video_url: string;
+  visualisation: string;
 }

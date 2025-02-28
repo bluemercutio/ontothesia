@@ -1,13 +1,14 @@
+import { NextRequest, NextResponse } from "next/server";
 import { dbService } from "@/services/db/client";
-import { NextResponse } from "next/server";
 
 export async function GET(
-  request: Request,
-  { params }: { params: { artefact_id: string } }
+  request: NextRequest,
+  context: { params: { id: string; artefact_id: string } }
 ) {
   try {
+    // Use params directly in the async function call
     const embedding = await dbService.getEmbeddingByArtefactId(
-      params.artefact_id
+      context.params.artefact_id
     );
 
     if (!embedding) {
@@ -19,8 +20,9 @@ export async function GET(
 
     return NextResponse.json(embedding);
   } catch (error) {
+    console.error("Error fetching embedding:", error);
     return NextResponse.json(
-      { error: `Failed to fetch embedding: ${error}` },
+      { error: "Failed to fetch embedding" },
       { status: 500 }
     );
   }

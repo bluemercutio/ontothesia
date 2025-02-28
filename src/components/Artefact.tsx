@@ -7,7 +7,7 @@ const Artefact: React.FC<ArtefactType> = ({ text, region, approx_date }) => {
       className={`
         w-72
         h-auto
-        bg-[var(--card-bg)]
+        bg-[var(--primary-bg)]
         rounded-xl 
         shadow-lg 
         overflow-hidden 

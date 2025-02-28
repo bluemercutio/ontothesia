@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { memo } from "react";
 import styled from "styled-components";
 
 interface NavItemProps {
@@ -14,7 +14,7 @@ const NavContainer = styled.nav`
   transform: translateX(-50%);
   background: var(--background);
   border-radius: 0px;
-  border: 1px solid #fff;
+  border: 0.5px solid #fff;
   padding: 12px 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -58,7 +58,7 @@ interface NavbarProps {
   onTabChange: (tab: string) => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
+const Navbar: React.FC<NavbarProps> = memo(({ activeTab, onTabChange }) => {
   const tabs = [
     { id: "home", label: "HOME" },
     { id: "gallery", label: "GALLERY" },
@@ -80,6 +80,8 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
       ))}
     </NavContainer>
   );
-};
+});
+
+Navbar.displayName = "Navbar";
 
 export default Navbar;

@@ -27,10 +27,9 @@ const createScreenMesh = (
   width: number,
   height: number,
   material: THREE.Material
-): THREE.LineSegments => {
+): THREE.Mesh => {
   const geometry = new THREE.PlaneGeometry(width, height);
-  const edges = new THREE.EdgesGeometry(geometry);
-  const screen = new THREE.LineSegments(edges, material);
+  const screen = new THREE.Mesh(geometry, material);
   return screen;
 };
 
@@ -38,22 +37,19 @@ const createScreenMesh = (
  * Optionally, create a video texture or just a white material for debugging.
  * Now modified to create an outline instead of a filled mesh.
  */
-const createScreenMaterial = (videoElement?: HTMLVideoElement) => {
-  if (!videoElement) {
-    // fallback: plain white outline
-    return new THREE.LineBasicMaterial({
+const createScreenMaterial = (texture?: THREE.Texture) => {
+  if (!texture) {
+    // fallback: plain white material
+    return new THREE.MeshBasicMaterial({
       color: 0xffffff,
+      side: THREE.DoubleSide,
     });
   }
 
-  // Otherwise, create a video texture outline
-  const videoTexture = new THREE.VideoTexture(videoElement);
-  videoTexture.minFilter = THREE.LinearFilter;
-  videoTexture.magFilter = THREE.LinearFilter;
-  videoTexture.format = THREE.RGBAFormat;
-
-  return new THREE.LineBasicMaterial({
-    map: videoTexture,
+  // Create material with texture
+  return new THREE.MeshBasicMaterial({
+    map: texture,
+    side: THREE.DoubleSide,
   });
 };
 
@@ -111,10 +107,10 @@ const placeRing = (
  */
 export const createCinemaScreens = (
   scene: THREE.Scene,
-  videoElement?: HTMLVideoElement
+  texture?: THREE.Texture
 ) => {
   // 1. Build the shared material (video or plain white)
-  const material = createScreenMaterial(videoElement);
+  const material = createScreenMaterial(texture);
 
   // We'll treat "eye-level" as phi ~ π/2, "above" as phi ~ π/3, "top" as phi ~ 0
   // Adjust angles & distances to taste

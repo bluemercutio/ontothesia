@@ -21,15 +21,15 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
   };
 
   return (
-    <div className="relative mx-auto border">
+    <div className="relative mx-auto w-full max-w-4xl px-12">
       <div className="overflow-hidden">
         <div
-          className="transition-transform duration-300 ease-in-out flex"
+          className="transition-transform duration-500 ease-in-out flex gap-6"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
           {React.Children.map(children, (child) => (
             <div className="w-full flex-shrink-0">
-              <div className="flex justify-center">{child}</div>
+              <div className="flex justify-center items-center">{child}</div>
             </div>
           ))}
         </div>
@@ -37,7 +37,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
 
       <button
         onClick={prevSlide}
-        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg z-10"
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[var(--primary-bg)] hover:bg-[var(--primary-bg-hover)] rounded-full p-3 shadow-lg z-10 transition-all hover:scale-110"
         aria-label="Previous"
       >
         <svg
@@ -45,7 +45,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
-          stroke="currentColor"
+          stroke="var(--foreground)"
           className="w-6 h-6"
         >
           <path
@@ -58,7 +58,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
 
       <button
         onClick={nextSlide}
-        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg z-10"
+        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[var(--primary-bg)] hover:bg-[var(--primary-bg-hover)] rounded-full p-3 shadow-lg z-10 transition-all hover:scale-110"
         aria-label="Next"
       >
         <svg
@@ -66,7 +66,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
-          stroke="currentColor"
+          stroke="var(--foreground)"
           className="w-6 h-6"
         >
           <path
@@ -77,13 +77,14 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
         </svg>
       </button>
 
-      {/* Optional: Add dots for navigation */}
-      <div className="flex justify-center gap-2 mt-4">
+      <div className="flex justify-center gap-3 mt-6">
         {React.Children.map(children, (_, index) => (
           <button
             onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-colors ${
-              currentIndex === index ? "bg-blue-500" : "bg-gray-300"
+            className={`w-3 h-3 rounded-full transition-all ${
+              currentIndex === index
+                ? "bg-[var(--foreground)] scale-110"
+                : "bg-[var(--primary-bg)] hover:bg-[var(--primary-bg-hover)]"
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />

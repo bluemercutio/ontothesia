@@ -1,33 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useMemo } from "react";
 import Navbar from "./Navbar";
 
 export default function NavbarWrapper() {
-  const [activeTab, setActiveTab] = useState("home");
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const activeTab = useMemo(() => {
+    const path = pathname.split("/")[1] || "home";
+    return path;
+  }, [pathname]);
 
   const handleSetActiveTab = (tab: string) => {
-    switch (tab) {
-      case "home":
-        window.location.href = "/";
-        break;
-      case "gallery":
-        window.location.href = "/gallery";
-        break;
-      case "cinema":
-        window.location.href = "/cinema";
-        break;
-      case "project":
-        window.location.href = "/project";
-        break;
-      case "library":
-        window.location.href = "/library";
-        break;
-      default:
-        window.location.href = "/";
-        break;
-    }
-    setActiveTab(tab);
+    const path = tab === "home" ? "/" : `/${tab}`;
+    router.push(path);
   };
 
   return <Navbar activeTab={activeTab} onTabChange={handleSetActiveTab} />;

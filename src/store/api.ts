@@ -4,12 +4,21 @@ import { Artefact } from "@/types/artefact";
 import { Embedding } from "@/types/embedding";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BASE_URL = "/api"; // Adjust this according to your backend setup
+// Update the BASE_URL to include the full URL
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api"; // Adjust port if different
 
 export const api = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: BASE_URL,
+    // Add some error handling
+    prepareHeaders: (headers) => {
+      headers.set("Content-Type", "application/json");
+      return headers;
+    },
+  }),
   tagTypes: ["Experience", "Scene", "Artefact", "Embedding"],
+  keepUnusedDataFor: 3600, // Keep unused data in cache for 1 hour
   endpoints: (builder) => ({
     // ───────────────────────────────────────────────────────────────────
     // EXPERIENCES

@@ -9,7 +9,7 @@ generator client {
 }
 
 model Experience {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   title       String
   description String
   image_url   String
@@ -17,26 +17,28 @@ model Experience {
 }
 
 model Scene {
-  id           String      @id @default(uuid())
-  title        String
-  description  String
-  image_url    String
-  video_url    String
-  // Many-to-many relationship to Artefact
-  artefacts    Artefact[]  @relation("SceneToArtefact")
+  id            String      @id @default(uuid())
+  title         String
+  context       String
+  image_url     String
+  video_url     String
+  // One-to-one relationship with Artefact
+  artefact      Artefact    @relation(fields: [artefactId], references: [id])
+  artefactId    String      @unique
   // One-to-many relationship back to Experience
-  experience   Experience? @relation(fields: [experienceId], references: [id])
-  experienceId String?
+  experience    Experience? @relation(fields: [experienceId], references: [id])
+  experienceId  String?
+  visualisation String
 }
 
 model Artefact {
-  id          String    @id
+  id          String     @id
   title       String
   text        String
   region      String
   approx_date String
   citation    String
-  scenes      Scene[]   @relation("SceneToArtefact")
+  scene       Scene?
   embedding   Embedding?
 }
 

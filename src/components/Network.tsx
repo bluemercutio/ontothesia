@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import {
   EmbeddingNetwork,
   GraphNode,
   GraphEdge,
 } from "../services/graph/interface";
+import { NetworkOverlay } from "./NetworkOverlay";
+import { useGetArtefactByIdQuery } from "../store/api";
 
 type SimNode = d3.SimulationNodeDatum & GraphNode;
 type SimLink = d3.SimulationLinkDatum<SimNode> & GraphEdge;
@@ -23,6 +25,15 @@ export const Network: React.FC<NetworkProps> = ({
   startingNode,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
+
+  // Use the RTK Query hook when a node is selected
+  const { data: artefact, isLoading } = useGetArtefactByIdQuery(
+    selectedNode?.artefact || "",
+    { skip: !selectedNode }
+  );
+
+  console.log("Selected node:", selectedNode?.id, "Artefact:", artefact?.title);
 
   useEffect(() => {
     if (!data || !data.nodes || !data.edges) return;
@@ -90,8 +101,22 @@ export const Network: React.FC<NetworkProps> = ({
       .enter()
       .append("circle")
       .attr("r", 8)
-      .attr("fill", (d) => (d.id === startingNode ? "#ff4444" : "steelblue"))
-      .call(drag);
+      .attr("fill", (d) => {
+        if (d.id === startingNode) return "#ff4444";
+        if (selectedNode && d.id === selectedNode.id) return "#ff8800";
+        return "steelblue";
+      })
+      .call(drag)
+      .on("click", (event, d) => {
+        // Handle node selection
+        event.stopPropagation();
+        setSelectedNode(d);
+      });
+
+    // Click on background to deselect
+    svg.on("click", () => {
+      setSelectedNode(null);
+    });
 
     simulation.on("tick", () => {
       nodes.forEach(constrainNode);
@@ -104,11 +129,41 @@ export const Network: React.FC<NetworkProps> = ({
 
       node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
     });
-  }, [data, width, height, startingNode]);
+  }, [data, width, height, startingNode, selectedNode]);
+
+  const handleNodeSelect = (nodeId: string | null) => {
+    if (!nodeId) {
+      setSelectedNode(null);
+      return;
+    }
+
+    const node = data.nodes.find((n) => n.id === nodeId);
+    if (node) {
+      setSelectedNode(node);
+    }
+  };
 
   return (
-    <div className="flex justify-center w-full ">
-      <svg ref={svgRef} width={width} height={height}></svg>
+    <div className="flex justify-center w-full relative">
+      <div
+        className="absolute right-0 z-10"
+        style={{
+          top: "-40px", // This positions the overlay higher
+        }}
+      >
+        <NetworkOverlay
+          selectedNode={selectedNode}
+          artefact={artefact || null}
+          isLoading={isLoading}
+          onNodeSelect={handleNodeSelect}
+        />
+      </div>
+      <svg
+        ref={svgRef}
+        width={width}
+        height={height}
+        className="relative"
+      ></svg>
     </div>
   );
 };
