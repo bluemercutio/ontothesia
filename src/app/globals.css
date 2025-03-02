@@ -29,9 +29,11 @@
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  --body-color: var(--foreground);
+  --body-background: var(--background);
   font-family: var(--kanit), Arial, Helvetica, sans-serif;
+  color: var(--body-color);
+  background-color: var(--body-background);
 }
 
 /* Custom Scrollbar Styles */

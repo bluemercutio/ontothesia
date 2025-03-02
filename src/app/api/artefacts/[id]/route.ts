@@ -3,20 +3,17 @@ import { dbService } from "@/services/db/client";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
-    // Await params before accessing its properties
-    const { id } = await params;
     const artefact = await dbService.getArtefactById(id);
-
     if (!artefact) {
       return NextResponse.json(
         { error: "Artefact not found" },
         { status: 404 }
       );
     }
-
     return NextResponse.json(artefact);
   } catch (error) {
     console.error("Error fetching artefact:", error);

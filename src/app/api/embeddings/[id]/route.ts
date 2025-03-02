@@ -3,9 +3,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     const embedding = await dbService.getEmbeddingById(params.id);
 
     if (!embedding) {

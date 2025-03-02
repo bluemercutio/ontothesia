@@ -3,11 +3,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const resolvedParams = await Promise.resolve(params);
+  const params = await context.params;
   try {
-    const experience = await dbService.getExperienceById(resolvedParams.id);
+    const experience = await dbService.getExperienceById(params.id);
 
     if (!experience) {
       return NextResponse.json(

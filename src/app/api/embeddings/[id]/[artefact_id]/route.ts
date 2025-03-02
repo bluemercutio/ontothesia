@@ -3,12 +3,13 @@ import { dbService } from "@/services/db/client";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string; artefact_id: string } }
+  context: { params: Promise<{ id: string; artefact_id: string }> }
 ) {
   try {
     // Use params directly in the async function call
+    const params = await context.params;
     const embedding = await dbService.getEmbeddingByArtefactId(
-      context.params.artefact_id
+      params.artefact_id
     );
 
     if (!embedding) {

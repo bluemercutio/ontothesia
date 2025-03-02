@@ -9,7 +9,7 @@ export default function NavbarWrapper() {
   const pathname = usePathname();
 
   const activeTab = useMemo(() => {
-    const path = pathname.split("/")[1] || "home";
+    const path = pathname?.split("/")[1] || "home";
     return path;
   }, [pathname]);
 

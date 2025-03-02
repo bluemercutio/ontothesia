@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 interface CardProps {
   title: string;
@@ -28,12 +29,8 @@ const Card: React.FC<CardProps> = ({
       style={{ background: "var(none)" }}
     >
       {imageUrl && (
-        <div className="w-full h-1/3">
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
+        <div className="w-full h-1/3 relative">
+          <Image src={imageUrl} alt={title} fill className="object-cover" />
         </div>
       )}
       <div className="p-4 h-2/3">
