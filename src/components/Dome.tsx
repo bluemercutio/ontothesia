@@ -35,7 +35,8 @@ const DomeScene: React.FC<{ scenes: Scene[]; generations: Generation[] }> = ({
 
     // Create scene and renderer.
     const scene = new THREE.Scene();
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0); // Allows background to show through
     renderer.setSize(width, height);
     mount?.appendChild(renderer.domElement);
 

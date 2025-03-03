@@ -3,11 +3,8 @@ import * as THREE from "three";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
 import { Scene } from "@/types/scene";
 import { Generation } from "@/types/generation";
+import { vertexShader, fragmentShader } from "./shaders";
 
-/**
- * Creates a single screen mesh (Plane) at the given position.
- * If an image URL is provided, it is used as a texture.
- */
 export const createScreen = (
   position: THREE.Vector3,
   width = SCREEN_WIDTH,
@@ -16,55 +13,46 @@ export const createScreen = (
   generations: Generation[]
 ): THREE.Mesh => {
   const geometry = new THREE.PlaneGeometry(width, height);
-  let material: THREE.MeshBasicMaterial;
+
+  // Load the texture or use a fallback
+  let texture: THREE.Texture = new THREE.Texture(); // Default fallback
 
   if (scene) {
     const generation = generations.find(
-      (generation) => generation.id === "generation_" + scene.artefact
+      (g) => g.id === "generation_" + scene.artefact
     );
-
     if (generation) {
-      try {
-        // Convert local filesystem path to server URL path
-        const imageUrl = `/api/images/${generation.image_url.split("/").pop()}`;
-        // or if you have a different API endpoint structure:
-        // const imageUrl = `/api/generations/${generation.id}/image`;
-
-        const texture = new THREE.TextureLoader().load(
-          imageUrl,
-          undefined,
-          undefined,
-          (error) => {
-            console.warn("Error loading texture:", error);
-            material.color.set(0xffffff);
-          }
-        );
-        material = new THREE.MeshBasicMaterial({
-          map: texture,
-          side: THREE.DoubleSide,
-        });
-      } catch (error) {
-        console.warn("Error creating texture:", error);
-        material = new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          side: THREE.DoubleSide,
-        });
-      }
-    } else {
-      material = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        side: THREE.DoubleSide,
-      });
+      const imageUrl = `/api/images/${generation.image_url.split("/").pop()}`;
+      texture = new THREE.TextureLoader().load(
+        imageUrl,
+        undefined,
+        undefined,
+        (error) => {
+          console.warn("Error loading texture:", error);
+        }
+      );
     }
-  } else {
-    material = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      side: THREE.DoubleSide,
-    });
   }
 
+  if (!texture) {
+    texture = new THREE.Texture(); // blank fallback
+  }
+
+  // Create the ShaderMaterial with alpha blending
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      map: { value: texture },
+      minBorder: { value: 0.07 }, // Adjust this for more or less fade
+      maxBorder: { value: 0.17 },
+    },
+    vertexShader,
+    fragmentShader,
+    side: THREE.DoubleSide,
+    transparent: true, // Critical for proper background blending
+    depthWrite: false, // Ensures screens blend with background
+  });
+
   const screen = new THREE.Mesh(geometry, material);
-  // Place the screen and orient it to face the center.
   screen.position.copy(position);
   screen.lookAt(new THREE.Vector3(0, 0, 0));
 
