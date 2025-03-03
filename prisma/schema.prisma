@@ -29,6 +29,7 @@ model Scene {
   experience    Experience? @relation(fields: [experienceId], references: [id])
   experienceId  String?
   visualisation String
+  generations   Generation[]
 }
 
 model Artefact {
@@ -40,6 +41,7 @@ model Artefact {
   citation    String
   scene       Scene?
   embedding   Embedding?
+  generations Generation[]
 }
 
 model Embedding {
@@ -49,3 +51,15 @@ model Embedding {
   artefact   Artefact @relation(fields: [artefactId], references: [id])
   artefactId String   @unique
 }
+
+model Generation {
+  id        String   @id @default(uuid())
+  prompt    String
+  image_url String
+  artefact  Artefact @relation(fields: [artefactId], references: [id])
+  artefactId String
+  scene     Scene    @relation(fields: [sceneId], references: [id])
+  sceneId   String
+}
+
+

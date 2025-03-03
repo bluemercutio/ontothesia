@@ -13,32 +13,35 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({
   title,
-  description,
   text,
   imageUrl,
   width,
   height,
   component,
 }) => {
-  console.log("width:", width);
   return (
     <div
       className={`relative ${width || "w-64"} ${
         height || "h-80"
-      } overflow-hidden transition-transform duration-300 hover:scale-105 `}
+      } overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col`}
       style={{ background: "var(none)" }}
     >
       {imageUrl && (
-        <div className="w-full h-1/3 relative">
-          <Image src={imageUrl} alt={title} fill className="object-cover" />
+        <div className="w-full aspect-square relative">
+          <Image
+            src={imageUrl}
+            alt={title}
+            width={1024}
+            height={1024}
+            className="object-cover w-full h-full"
+            priority
+          />
         </div>
       )}
-      <div className="p-4 h-2/3">
-        <h3 className="text-xl font-semibold mb-2">{title}</h3>
-        {description && <p className="text-gray-600 text-sm">{description}</p>}
+      <div className="p-4 flex-1 flex flex-col">
         {component && <div className="mt-2">{component}</div>}
+        {text && <p className="text-gray-600 text-sm mt-auto">{text}</p>}
       </div>
-      {text && <p className="text-gray-600 text-sm p-4 ">{text}</p>}
     </div>
   );
 };

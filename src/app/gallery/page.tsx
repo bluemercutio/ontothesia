@@ -56,7 +56,7 @@ export default function Gallery() {
                       description={item.description}
                       imageUrl={item.image_url}
                       width="w-96"
-                      height="100%"
+                      height="h-96"
                     />
                   </div>
                 ))}

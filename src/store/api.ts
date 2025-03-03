@@ -3,6 +3,7 @@ import { Scene } from "@/types/scene";
 import { Artefact } from "@/types/artefact";
 import { Embedding } from "@/types/embedding";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { Generation } from "@/types/generation";
 
 // Update the BASE_URL to include the full URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api"; // Adjust port if different
@@ -17,7 +18,7 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Experience", "Scene", "Artefact", "Embedding"],
+  tagTypes: ["Experience", "Scene", "Artefact", "Embedding", "Generation"],
   keepUnusedDataFor: 3600, // Keep unused data in cache for 1 hour
   endpoints: (builder) => ({
     // ───────────────────────────────────────────────────────────────────
@@ -71,6 +72,14 @@ export const api = createApi({
       query: () => "/embeddings",
       providesTags: ["Embedding"],
     }),
+
+    // ───────────────────────────────────────────────────────────────────
+    // GENERATIONS
+    // ───────────────────────────────────────────────────────────────────
+    getGenerations: builder.query<Generation[], void>({
+      query: () => "/generations",
+      providesTags: ["Generation"],
+    }),
   }),
 });
 
@@ -84,4 +93,5 @@ export const {
   useGetArtefactsQuery,
   useGetArtefactByIdQuery,
   useGetEmbeddingsQuery,
+  useGetGenerationsQuery,
 } = api;

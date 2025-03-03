@@ -6,7 +6,7 @@ export const scenes: Scene[] = [
     title: "The River of Life",
     context:
       "A grand depiction of the Nile River, flowing through ancient Egypt, surrounded by lush vegetation and farmers working on the fertile banks.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "1",
     visualisation:
@@ -17,7 +17,7 @@ export const scenes: Scene[] = [
     title: "The Sage’s Counsel",
     context:
       "A serene setting in an ancient Egyptian temple courtyard, where the aged sage Ptahhotep imparts wisdom to a gathering of scribes, artisans, and common folk. The warm glow of oil lamps flickers against the hieroglyph-covered walls.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "2",
     visualisation:
@@ -28,7 +28,7 @@ export const scenes: Scene[] = [
     title: "The Radiance of Aten",
     context:
       "A grand scene set in the city of Akhetaten (modern Amarna), where Pharaoh Akhenaten and Queen Nefertiti stand beneath the sun disk Aten, its rays ending in hands bestowing life upon the people.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "3",
     visualisation:
@@ -39,7 +39,7 @@ export const scenes: Scene[] = [
     title: "The Compassion of a Conqueror",
     context:
       "A dramatic moment in the court of Piye, the Kushite king, as he confronts defeated Egyptian rulers. His fury is not for their disloyalty, but for the mistreatment of his noble warhorses.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "4",
     visualisation:
@@ -50,7 +50,7 @@ export const scenes: Scene[] = [
     title: "The Queen’s Wisdom",
     context:
       "Queen Makeda of Sheba stands before her people in the great palace of Aksum, addressing them with words of wisdom as they listen in awe.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "5",
     visualisation:
@@ -61,7 +61,7 @@ export const scenes: Scene[] = [
     title: "The Birth of Mountains",
     context:
       "A cosmic event unfolds as Wak shapes the earth through fire and transformation, burying and resurrecting the first man from the depths of the land.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "6",
     visualisation:
@@ -72,7 +72,7 @@ export const scenes: Scene[] = [
     title: "A Mother's Final Lesson",
     context:
       "In a quiet coastal home, a mother on her deathbed imparts her final wisdom to her young daughter, sharing lessons of life, love, and resilience.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "7",
     visualisation:
@@ -83,7 +83,7 @@ export const scenes: Scene[] = [
     title: "The Awakening of Life",
     context:
       "The first man and woman, oblivious to the ways of procreation, come to a moment of realization in the quiet wilderness, shaping the destiny of future generations.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "8",
     visualisation:
@@ -94,7 +94,7 @@ export const scenes: Scene[] = [
     title: "The Birth of Ife",
     context:
       "The divine realm descends upon the waters as Obatala crafts the land, shaping the world from a mere shell of sand and the gentle fluttering of a hen’s wings.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "9",
     visualisation:
@@ -105,7 +105,7 @@ export const scenes: Scene[] = [
     title: "The Python’s Gift",
     context:
       "Two couples—one from the heavens, one from the earth—stand at the dawn of humanity, learning the secret of life from a sacred python.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "10",
     visualisation:
@@ -116,7 +116,7 @@ export const scenes: Scene[] = [
     title: "Defying the Creator",
     context:
       "The first humans, created by Abassi, live under his strict rule, but the woman’s quiet defiance begins to change the fate of humankind.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "11",
     visualisation:
@@ -127,7 +127,7 @@ export const scenes: Scene[] = [
     title: "The Gods Create a Ruler",
     context:
       "Nzame and his divine aspects shape the universe, admiring its beauty before deciding that a ruler is needed to govern the earth.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "12",
     visualisation:
@@ -138,7 +138,7 @@ export const scenes: Scene[] = [
     title: "The Golden City of Knowledge",
     context:
       "A bustling scene in the heart of Timbuktu, where scholars, merchants, and travelers gather in the famous marketplaces and universities.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "13",
     visualisation:
@@ -149,7 +149,7 @@ export const scenes: Scene[] = [
     title: "Bumba's Birth of the Cosmos",
     context:
       "In the silent, endless waters of the beginning, the god Bumba writhes in pain, his suffering birthing the very elements of existence.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "14",
     visualisation:
@@ -160,7 +160,7 @@ export const scenes: Scene[] = [
     title: "Modimo, Keeper of Balance",
     context:
       "A divine representation of Modimo as both creator and destroyer, shaping the world through water and fire, embodying all elements of existence.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "15",
     visualisation:
@@ -171,7 +171,7 @@ export const scenes: Scene[] = [
     title: "The Dance of the Baboons",
     context:
       "A mischievous and magical tale of Cagn's son, Cogaz, and his transformation of the laughing baboon-men.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "16",
     visualisation:
@@ -182,7 +182,7 @@ export const scenes: Scene[] = [
     title: "The Mantis and the Moon",
     context:
       "A poetic moment in which the Praying Mantis carries the message of the moon, only to falter on his journey, forever changing the fate of humankind.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "17",
     visualisation:
@@ -193,7 +193,7 @@ export const scenes: Scene[] = [
     title: "A King’s Plea",
     context:
       "King Afonso I of Kongo, seated in his royal court, pens a desperate letter to the King of Portugal, lamenting the destruction of his kingdom through unchecked slavery and corruption.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "18",
     visualisation:
@@ -204,7 +204,7 @@ export const scenes: Scene[] = [
     title: "The Chains of the Middle Passage",
     context:
       "A moment of horror and despair aboard a slave ship, as Olaudah Equiano witnesses the cruel reality of his fate.",
-    image_url: "", // Placeholder
+    image_url: "/images/default_experience.png", //Placeholder
     video_url: "", // Placeholder
     artefact: "19",
     visualisation:

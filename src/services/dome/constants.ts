@@ -1,0 +1,3 @@
+const SCREEN_WIDTH = 3;
+const SCREEN_HEIGHT = 3;
+export { SCREEN_WIDTH, SCREEN_HEIGHT };

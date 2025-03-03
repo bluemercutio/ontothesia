@@ -3,27 +3,71 @@
 import React from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
-import { useGetExperiencesQuery } from "@/store/api";
+import { useGetExperiencesQuery, useGetGenerationsQuery } from "@/store/api";
 import { useParams } from "next/navigation";
 import DomeScene from "@/components/Dome";
-
+import { useGetScenesQuery } from "@/store/api";
+import path from "path";
+import { Generation } from "@/types/generation";
 export default function ExperiencePage() {
   const params = useParams();
   const { data: experiences, isLoading, error } = useGetExperiencesQuery();
+  const allScenes = useGetScenesQuery();
+  const allGenerations = useGetGenerationsQuery();
+
+  if (!allGenerations.data || allGenerations.isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header title="Loading..." />
+        <main className="flex-1 container mx-auto px-4 py-8">
+          <div className="flex justify-center items-center h-full">
+            <div className="animate-pulse space-y-8 w-full max-w-2xl">
+              <div className="h-64 bg-gray-200 rounded-lg"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+  let processedGenerations: Generation[] = [];
+  if (!process.env.NEXT_PUBLIC_GENERATIONS_DIR) {
+    throw new Error("NEXT_PUBLIC_GENERATIONS_DIR is not set");
+  } else {
+    processedGenerations = allGenerations.data.map((generation) => ({
+      ...generation,
+      image_url: path.join(
+        process.env.NEXT_PUBLIC_GENERATIONS_DIR || "",
+        generation.image_url
+      ),
+    }));
+  }
+
+  console.log("All scenes", allScenes.data);
+  console.log("All generations", processedGenerations);
+
+  if (!allScenes.data) {
+    return <div>No scenes or experiences found</div>;
+  }
+
+  if (!experiences) {
+    return <div>No experiences found</div>;
+  }
+
+  const scenes = allScenes.data?.filter((scene) => {
+    return experiences.some((experience) =>
+      experience.scenes.includes(scene.id)
+    );
+  });
 
   if (!experiences && !isLoading && !error) {
     return <div>No experiences found</div>;
   }
-
-  console.log("PARAMS", params);
-  console.log("EXPERIENCES", experiences);
 
   if (!params) {
     return <div>No params found</div>;
   }
 
   const experience = experiences?.find((exp) => exp.id === params?.id);
-  console.log("EXPERIENCE", experience);
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -65,7 +109,7 @@ export default function ExperiencePage() {
       <Header title={experience.title} />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex flex-col items-center gap-8">
-          <DomeScene />
+          <DomeScene scenes={scenes} generations={processedGenerations} />
         </div>
       </main>
     </div>

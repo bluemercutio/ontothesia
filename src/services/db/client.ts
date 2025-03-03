@@ -7,7 +7,7 @@ import { Scene, SceneId } from "../../types/scene";
 import { Experience, ExperienceId } from "../../types/experience";
 import { Embedding, EmbeddingId } from "@/types/embedding";
 import crypto from "crypto";
-
+import { Generation } from "@/types/generation";
 const prisma = new PrismaClient();
 
 export const dbService: DBService = {
@@ -268,5 +268,44 @@ export const dbService: DBService = {
     artefactId: ArtefactId
   ): Promise<Embedding | null> => {
     return prisma.embedding.findFirst({ where: { artefactId } });
+  },
+
+  // ───────────────────────────────────────────────────────────────────
+  // GENERATION
+  // ───────────────────────────────────────────────────────────────────
+  createGeneration: async (
+    data: Omit<Generation, "id">
+  ): Promise<Generation> => {
+    const created = await prisma.generation.create({
+      data: {
+        id: crypto.randomUUID(),
+        image_url: data.image_url,
+        prompt: data.prompt,
+        artefactId: data.artefact,
+        sceneId: data.scene,
+      },
+      include: {
+        artefact: true,
+        scene: true,
+      },
+    });
+    return {
+      ...created,
+      artefact: created.artefactId,
+      scene: created.sceneId,
+    };
+  },
+  getAllGenerations: async (): Promise<Generation[]> => {
+    const generations = await prisma.generation.findMany({
+      include: {
+        artefact: true,
+        scene: true,
+      },
+    });
+    return generations.map((gen) => ({
+      ...gen,
+      artefact: gen.artefactId,
+      scene: gen.sceneId,
+    }));
   },
 };

@@ -1,8 +1,9 @@
 import { Artefact } from "../src/types/artefact";
 
-export const artefacts: Partial<Artefact>[] = [
+export const artefacts: Artefact[] = [
   {
     id: "1",
+    embedding: "1-embedding",
     title: "Hymn to the Nile",
     region: "Ancient Egypt & North Africa",
     approx_date: "ca. 2100 BCE",
@@ -12,6 +13,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "2",
+    embedding: "2-embedding",
     title: "Instruction of Ptahhotep",
     region: "Ancient Egypt & North Africa",
     approx_date: "ca. 2400 BCE",
@@ -21,6 +23,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "3",
+    embedding: "3-embedding",
     title: "Great Hymn to Aten",
     region: "Ancient Egypt & North Africa",
     approx_date: "14th century BCE",
@@ -30,6 +33,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "4",
+    embedding: "4-embedding",
     title: "Victory Stele of Piye",
     region: "Ancient Egypt & North Africa",
     approx_date: "ca. 720 BCE",
@@ -39,6 +43,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "5",
+    embedding: "5-embedding",
     title: "Kebra Nagast (Glory of Kings)",
     region: "Ethiopia (Eastern Africa)",
     approx_date: "14th century CE",
@@ -48,6 +53,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "6",
+    embedding: "6-embedding",
     title: "Oromo (Ethiopian) Creation Myth",
     region: "Ethiopia (Eastern Africa)",
     approx_date: "Traditional/Oral",
@@ -57,6 +63,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "7",
+    embedding: "7-embedding",
     title: "Utendi wa Mwana Kupona",
     region: "Swahili Coast (Eastern Africa)",
     approx_date: "1858",
@@ -66,6 +73,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "8",
+    embedding: "8-embedding",
     title: "Luyia Creation Story",
     region: "Kenya (Eastern Africa)",
     approx_date: "Traditional/Oral",
@@ -75,6 +83,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "9",
+    embedding: "9-embedding",
     title: "Yoruba Creation Myth",
     region: "Nigeria (West Africa)",
     approx_date: "Traditional/Oral",
@@ -84,6 +93,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "10",
+    embedding: "10-embedding",
     title: "Ashanti Origin of Humans",
     region: "Ghana (West Africa)",
     approx_date: "Traditional/Oral",
@@ -93,6 +103,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "11",
+    embedding: "11-embedding",
     title: "Efik Creation Story",
     region: "Nigeria (West Africa)",
     approx_date: "Traditional/Oral",
@@ -102,6 +113,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "12",
+    embedding: "12-embedding",
     title: "Fon (Dahomey) Creation Myth",
     region: "Benin (West Africa)",
     approx_date: "Traditional/Oral",
@@ -111,6 +123,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "13",
+    embedding: "13-embedding",
     title: "Leo Africanus on Timbuktu",
     region: "Mali (West Africa)",
     approx_date: "ca. 1526",
@@ -120,6 +133,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "14",
+    embedding: "14-embedding",
     title: "Boshongo Creation Myth (Bushongo)",
     region: "Congo region (Central Africa)",
     approx_date: "Traditional/Oral",
@@ -129,6 +143,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "15",
+    embedding: "15-embedding",
     title: "Shona/Zimbabwe Creation Myth",
     region: "Zimbabwe (Southern Africa)",
     approx_date: "Traditional/Oral",
@@ -138,6 +153,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "16",
+    embedding: "16-embedding",
     title: "San Bushman Tale – 'Cagn and the Baboons'",
     region: "Southern Africa",
     approx_date: "Traditional/Oral",
@@ -147,6 +163,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "17",
+    embedding: "17-embedding",
     title: "San (Khoikhoi) Myth – How Death Came to Mankind",
     region: "Southern Africa",
     approx_date: "Traditional/Oral",
@@ -156,6 +173,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "18",
+    embedding: "18-embedding",
     title:
       "Letter of King Afonso I (Nzinga Mbemba) of Kongo to King João III of Portugal",
     region: "Kongo Kingdom (West-Central Africa)",
@@ -166,6 +184,7 @@ export const artefacts: Partial<Artefact>[] = [
   },
   {
     id: "19",
+    embedding: "19-embedding",
     title: "Olaudah Equiano's Middle Passage",
     region: "Igbo (present-day Nigeria, West Africa) / Diaspora",
     approx_date: "Written 1789",

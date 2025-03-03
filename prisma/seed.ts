@@ -3,6 +3,7 @@ import { artefacts } from "./artefacts";
 import { embeddings } from "./embeddings";
 import { scenes } from "./scenes";
 import { experiences } from "./experiences";
+import { generations } from "./generations";
 
 const prisma = new PrismaClient();
 
@@ -71,7 +72,7 @@ async function main() {
         context: scene.context,
         artefactId: scene.artefact,
         image_url:
-          "https://img.freepik.com/free-psd/cosmic-nebula-celestial-tapestry-stars-gas_632498-24057.jpg?semt=ais_hybrid",
+          "/api/proxy-image?url=https%3A%2F%2Fimg.freepik.com%2Ffree-psd%2Fcosmic-nebula-celestial-tapestry-stars-gas_632498-24057.jpg%3Fsemt%3Dais_hybrid",
         video_url: scene.video_url || "",
         visualisation: scene.visualisation,
         experienceId: null,
@@ -105,6 +106,20 @@ async function main() {
 
     console.log(`Created experience with id: ${createdExperience.id}`);
     console.log(`Updated scenes for experience: ${createdExperience.id}`);
+
+    for (const generation of generations) {
+      const createdGeneration = await prisma.generation.create({
+        data: {
+          id: "generation_" + generation.artefact,
+          prompt: generation.prompt,
+          image_url: generation.image_url,
+          artefactId: generation.artefact,
+          sceneId: generation.scene,
+        },
+      });
+
+      console.log(`Created generation with id: ${createdGeneration.id}`);
+    }
   }
 
   console.log("Seeding finished.");
