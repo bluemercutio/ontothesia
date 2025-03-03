@@ -7,6 +7,7 @@ import { PointerLockControls } from "three/examples/jsm/controls/PointerLockCont
 import { createDomeEnvironment } from "../services/dome/environment";
 import { Scene } from "@/types/scene";
 import { Generation } from "@/types/generation";
+import axios from "axios";
 
 const DomeScene: React.FC<{ scenes: Scene[]; generations: Generation[] }> = ({
   scenes,
@@ -16,6 +17,18 @@ const DomeScene: React.FC<{ scenes: Scene[]; generations: Generation[] }> = ({
 
   useEffect(() => {
     console.log("Dome Generations", generations);
+
+    const images = generations.map(async (generation) => {
+      const image = await fetchImage(generation);
+      if (image) {
+        return image;
+      } else {
+        return null;
+      }
+    });
+
+    console.log("Images", images);
+
     const mount = mountRef.current;
     const width = mount?.clientWidth || window.innerWidth;
     const height = mount?.clientHeight || window.innerHeight;
@@ -71,6 +84,18 @@ const DomeScene: React.FC<{ scenes: Scene[]; generations: Generation[] }> = ({
       renderer.dispose();
     };
   }, [scenes, generations]);
+
+  const fetchImage = async (generation: Generation) => {
+    try {
+      const image_url = `/api/images/${generation.image_url.split("/").pop()}`;
+      const response = await axios.get(image_url, { responseType: "blob" });
+      const url = URL.createObjectURL(response.data);
+      console.log("Fetched image URL:", url);
+      return response;
+    } catch (error) {
+      console.error("There was a problem with the fetch operation:", error);
+    }
+  };
 
   return <div ref={mountRef} style={{ width: "100%", height: "100vh" }} />;
 };
