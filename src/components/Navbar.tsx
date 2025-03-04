@@ -3,7 +3,6 @@
 import React, { memo } from "react";
 import styled from "styled-components";
 import { usePathname } from "next/navigation";
-import MapButton from "./MapButton";
 import { EmbeddingNetwork } from "../services/graph/interface";
 
 interface NavItemProps {
@@ -90,10 +89,6 @@ const Navbar: React.FC<NavbarProps> = memo(
         : false;
     }, [pathname]);
 
-    const showMapButton = React.useMemo(() => {
-      return pathname ? /^\/gallery\/[^/]+\/gallery$/.test(pathname) : false;
-    }, [pathname]);
-
     React.useEffect(() => {
       if (!shouldAutoHide) {
         setIsVisible(true);
@@ -142,18 +137,6 @@ const Navbar: React.FC<NavbarProps> = memo(
             </NavItem>
           ))}
         </NavContainer>
-        {showMapButton && networkData && (
-          <MapButton
-            $isVisible={!shouldAutoHide || isVisible}
-            onClick={() => {
-              console.log("Map button clicked, network data:", {
-                nodes: networkData.nodes?.length,
-                edges: networkData.edges?.length,
-              });
-            }}
-            data={networkData}
-          />
-        )}
       </>
     );
   }

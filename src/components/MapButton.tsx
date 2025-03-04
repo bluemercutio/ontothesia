@@ -4,12 +4,12 @@ import { Network } from "./Network";
 import { EmbeddingNetwork } from "../services/graph/interface";
 
 interface MapButtonProps {
-  $isVisible?: boolean;
+  isVisible?: boolean;
   onClick: () => void;
   data?: EmbeddingNetwork;
 }
 
-const StyledMapButton = styled.button<MapButtonProps>`
+const StyledMapButton = styled.button<{ $isVisible?: boolean }>`
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -29,22 +29,27 @@ const StyledMapButton = styled.button<MapButtonProps>`
   }
 `;
 
-const NetworkContainer = styled.div<{ isVisible: boolean }>`
+const NetworkContainer = styled.div<{
+  $isVisible: boolean;
+  $border?: boolean;
+  $rounded?: boolean;
+}>`
   position: fixed;
   bottom: 80px;
   right: 20px;
   background: var(--background);
-  border: 0.5px solid #fff;
+  border: ${(props) => (props.$border ? "0.5px solid #fff" : "none")};
   padding: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 999;
-  display: ${(props) => (props.isVisible ? "block" : "none")};
+  display: ${(props) => (props.$isVisible ? "block" : "none")};
   width: 400px;
   height: 300px;
   overflow: hidden;
+  border-radius: ${(props) => (props.$rounded ? "12px" : "0px")};
 `;
 
-const MapButton: React.FC<MapButtonProps> = ({ $isVisible, onClick, data }) => {
+const MapButton: React.FC<MapButtonProps> = ({ isVisible, onClick, data }) => {
   const [showNetwork, setShowNetwork] = useState(false);
 
   useEffect(() => {
@@ -64,10 +69,10 @@ const MapButton: React.FC<MapButtonProps> = ({ $isVisible, onClick, data }) => {
 
   return (
     <>
-      <StyledMapButton $isVisible={$isVisible} onClick={handleClick}>
+      <StyledMapButton $isVisible={isVisible} onClick={handleClick}>
         {showNetwork ? "Hide Map" : "Show Map"}
       </StyledMapButton>
-      <NetworkContainer isVisible={showNetwork}>
+      <NetworkContainer $isVisible={showNetwork} $border={true} $rounded={true}>
         {showNetwork && data && (
           <div style={{ width: "100%", height: "100%", position: "relative" }}>
             <Network

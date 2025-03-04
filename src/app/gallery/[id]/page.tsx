@@ -18,12 +18,6 @@ export default function GalleryOptions() {
           </button>
           <button
             className="bg-[var(--primary-bg)] text-onSecondary px-4 py-2 rounded-md"
-            onClick={() => router.push(`/gallery/${id}/room`)}
-          >
-            Room
-          </button>
-          <button
-            className="bg-[var(--primary-bg)] text-onSecondary px-4 py-2 rounded-md"
             onClick={() => router.push(`/gallery/${id}/gallery`)}
           >
             Gallery

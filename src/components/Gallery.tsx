@@ -15,6 +15,7 @@ interface GalleryProps {
   generations: Generation[];
   scenes: Scene[];
   THRESHOLD: number;
+  onNetworkChange: (network: EmbeddingNetwork) => void;
 }
 
 const Gallery: React.FC<GalleryProps> = ({
@@ -23,6 +24,7 @@ const Gallery: React.FC<GalleryProps> = ({
   generations,
   scenes,
   THRESHOLD,
+  onNetworkChange,
 }) => {
   // 1️⃣ Build the FULL network ONCE
   const [fullNetwork] = useState<EmbeddingNetwork>(() =>
@@ -108,6 +110,7 @@ const Gallery: React.FC<GalleryProps> = ({
             const nextSubNetwork = getSubNetwork(clickedEmbedding.id, 2);
             console.log("nextSubNetwork", nextSubNetwork);
             setCurrentNetwork(nextSubNetwork);
+            onNetworkChange?.(nextSubNetwork);
           } else {
             console.warn("No embedding found for scene:", clickedScene);
           }
@@ -116,7 +119,7 @@ const Gallery: React.FC<GalleryProps> = ({
         }
       }
     },
-    [getSubNetwork, mouse, raycaster, embeddings]
+    [getSubNetwork, mouse, raycaster, embeddings, onNetworkChange]
   );
 
   // 5️⃣ Update Scene: Rebuild whenever `currentNetwork` changes
@@ -135,7 +138,7 @@ const Gallery: React.FC<GalleryProps> = ({
 
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     cameraRef.current = camera;
-    camera.position.set(0, 0, 5);
+    camera.position.set(0, 0, 8);
     camera.lookAt(0, 0, 0);
 
     const currentScenes = scenes.filter((scene) =>

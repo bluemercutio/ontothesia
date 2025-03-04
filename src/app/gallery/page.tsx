@@ -20,15 +20,22 @@ export default function Gallery() {
           // Loading state that matches the layout
           <div className="flex-1 flex flex-col">
             <div className="flex-1 flex flex-col justify-center items-center min-h-screen">
-              <div className="animate-pulse w-64 h-80 bg-gray-200 rounded-lg"></div>
+              <div
+                className="animate-pulse w-64 h-80 rounded-lg"
+                style={{ backgroundColor: "var(--primary-bg)" }}
+              ></div>
             </div>
             <div className="min-h-screen pt-24">
-              <div className="w-48 h-8 bg-gray-200 rounded mx-auto mb-8"></div>
+              <div
+                className="w-48 h-8 rounded mx-auto mb-8"
+                style={{ backgroundColor: "var(--colour)" }}
+              ></div>
               <div className="flex flex-wrap justify-center gap-6">
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className="animate-pulse w-64 h-80 bg-gray-200 rounded-lg"
+                    className="animate-pulse w-64 h-80 rounded-lg"
+                    style={{ backgroundColor: "var(--primary-bg)" }}
                   ></div>
                 ))}
               </div>
