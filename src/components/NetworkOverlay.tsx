@@ -6,7 +6,7 @@ interface NetworkOverlayProps {
   selectedNode: GraphNode | null;
   artefact: Artefact | null;
   isLoading?: boolean;
-  onNodeSelect?: (nodeId: string | null) => void;
+  onNodeSelect: (nodeId: string) => void;
 }
 
 export const NetworkOverlay: React.FC<NetworkOverlayProps> = ({
@@ -108,7 +108,7 @@ export const NetworkOverlay: React.FC<NetworkOverlayProps> = ({
           </div>
 
           <button
-            onClick={() => onNodeSelect && onNodeSelect(null)}
+            onClick={() => onNodeSelect(selectedNode.id)}
             className="mt-3 text-xs hover:underline"
             style={{ color: "#3b82f6" }}
           >

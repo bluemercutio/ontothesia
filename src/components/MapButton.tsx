@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Network } from "./Network";
-import { EmbeddingNetwork } from "../services/graph/interface";
+import { EmbeddingNetwork, GraphNode } from "../services/graph/interface";
+import { Artefact } from "@/types/artefact";
 
 interface MapButtonProps {
   isVisible?: boolean;
-  onClick: () => void;
-  data?: EmbeddingNetwork;
+  data: EmbeddingNetwork;
+  currentNodeId: string;
+  setSelectedNode: (node: GraphNode) => void;
+  artefact: Artefact;
 }
 
 const StyledMapButton = styled.button<{ $isVisible?: boolean }>`
@@ -47,39 +50,56 @@ const NetworkContainer = styled.div<{
   height: 300px;
   overflow: hidden;
   border-radius: ${(props) => (props.$rounded ? "12px" : "0px")};
+  pointer-events: ${(props) =>
+    props.$isVisible ? "auto" : "none"}; /* Only capture events when visible */
 `;
 
-const MapButton: React.FC<MapButtonProps> = ({ isVisible, onClick, data }) => {
-  const [showNetwork, setShowNetwork] = useState(false);
+const MapButton: React.FC<MapButtonProps> = ({
+  isVisible,
+  data,
+  currentNodeId,
+  setSelectedNode,
+  artefact,
+}) => {
+  const [showNetwork, setShowNetwork] = useState<boolean>(false);
+  // const memoizedData = useMemo(() => data, [data]);
 
-  useEffect(() => {
-    if (showNetwork) {
-      console.log("Network should be visible", {
-        hasData: !!data,
-        dataNodes: data?.nodes?.length,
-        dataEdges: data?.edges?.length,
-      });
-    }
-  }, [showNetwork, data]);
-
-  const handleClick = () => {
-    setShowNetwork(!showNetwork);
-    onClick();
-  };
+  // useEffect(() => {
+  //   if (showNetwork) {
+  //     console.log("Network visible", {
+  //       hasData: !!memoizedData,
+  //       dataNodes: memoizedData?.nodes?.length,
+  //       dataEdges: memoizedData?.edges?.length,
+  //     });
+  //   }
+  // }, [showNetwork]);
 
   return (
     <>
-      <StyledMapButton $isVisible={isVisible} onClick={handleClick}>
+      <StyledMapButton
+        $isVisible={isVisible}
+        onClick={() => setShowNetwork((prev) => !prev)}
+      >
         {showNetwork ? "Hide Map" : "Show Map"}
       </StyledMapButton>
-      <NetworkContainer $isVisible={showNetwork} $border={true} $rounded={true}>
+      <NetworkContainer
+        $isVisible={showNetwork}
+        $border={true}
+        $rounded={true}
+        onClick={(e) => e.stopPropagation()} // Stop clicks from propagating to gallery
+      >
         {showNetwork && data && (
-          <div style={{ width: "100%", height: "100%", position: "relative" }}>
+          <div
+            style={{ width: "100%", height: "100%", position: "relative" }}
+            onClick={(e) => e.stopPropagation()} // Contain clicks within the map
+          >
             <Network
               data={data}
               width={376}
               height={276}
-              startingNode={data.nodes[0]?.id}
+              currentNodeId={currentNodeId}
+              setSelectedNode={setSelectedNode}
+              artefact={artefact}
             />
           </div>
         )}

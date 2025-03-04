@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import {
   EmbeddingNetwork,
@@ -6,7 +6,8 @@ import {
   GraphEdge,
 } from "../services/graph/interface";
 import { NetworkOverlay } from "./NetworkOverlay";
-import { useGetArtefactByIdQuery } from "../store/api";
+
+import { Artefact } from "@/types/artefact";
 
 type SimNode = d3.SimulationNodeDatum & GraphNode;
 type SimLink = d3.SimulationLinkDatum<SimNode> & GraphEdge;
@@ -15,28 +16,32 @@ type NetworkProps = {
   data: EmbeddingNetwork; // Graph structure with nodes and links
   width?: number;
   height?: number;
-  startingNode?: string;
+  currentNodeId: string;
+  setSelectedNode: (node: GraphNode) => void;
+  artefact: Artefact;
 };
 
 export const Network: React.FC<NetworkProps> = ({
   data,
   width = 800,
   height = 600,
-  startingNode,
+  currentNodeId,
+  setSelectedNode,
+  artefact,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
 
-  // Use the RTK Query hook when a node is selected
-  const { data: artefact, isLoading } = useGetArtefactByIdQuery(
-    selectedNode?.artefact || "",
-    { skip: !selectedNode }
-  );
+  if (!artefact) {
+    throw new Error("No artefact");
+  }
 
-  console.log("Selected node:", selectedNode?.id, "Artefact:", artefact?.title);
+  console.log("Artefact:", artefact.title);
 
   useEffect(() => {
-    if (!data || !data.nodes || !data.edges) return;
+    if (!data || !data.nodes || !data.edges) {
+      console.log("No data");
+      return;
+    }
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove(); // Clear previous render
@@ -101,22 +106,25 @@ export const Network: React.FC<NetworkProps> = ({
       .enter()
       .append("circle")
       .attr("r", 8)
-      .attr("fill", (d) => {
-        if (d.id === startingNode) return "#ff4444";
-        if (selectedNode && d.id === selectedNode.id) return "#ff8800";
-        return "steelblue";
-      })
+      .attr("fill", (d) => (d.id === currentNodeId ? "#ff4444" : "steelblue"))
       .call(drag)
       .on("click", (event, d) => {
-        // Handle node selection
+        // Stop propagation of this specific click
         event.stopPropagation();
         setSelectedNode(d);
       });
 
-    // Click on background to deselect
-    svg.on("click", () => {
-      setSelectedNode(null);
-    });
+    // Modify how the SVG captures events
+    svg.style("pointer-events", "all");
+
+    // When setting up svg click handler:
+    // svg.on("click", function (event) {
+    //   // Stop propagation to prevent the click from reaching ThreeJS
+    //   event.stopPropagation();
+
+    //   // Your existing node selection logic
+    //   setSelectedNode(data.nodes[0]);
+    // });
 
     simulation.on("tick", () => {
       nodes.forEach(constrainNode);
@@ -129,14 +137,9 @@ export const Network: React.FC<NetworkProps> = ({
 
       node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
     });
-  }, [data, width, height, startingNode, selectedNode]);
+  }, [data, width, height, currentNodeId, setSelectedNode]);
 
-  const handleNodeSelect = (nodeId: string | null) => {
-    if (!nodeId) {
-      setSelectedNode(null);
-      return;
-    }
-
+  const handleNodeSelect = (nodeId: string) => {
     const node = data.nodes.find((n) => n.id === nodeId);
     if (node) {
       setSelectedNode(node);
@@ -152,9 +155,8 @@ export const Network: React.FC<NetworkProps> = ({
         }}
       >
         <NetworkOverlay
-          selectedNode={selectedNode}
-          artefact={artefact || null}
-          isLoading={isLoading}
+          selectedNode={data.nodes.find((n) => n.id === currentNodeId) ?? null}
+          artefact={artefact ?? null}
           onNodeSelect={handleNodeSelect}
         />
       </div>

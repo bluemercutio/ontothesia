@@ -1,22 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useCallback, JSX } from "react";
 import Gallery from "@/components/Gallery";
 import {
   useGetEmbeddingsQuery,
   useGetGenerationsQuery,
   useGetScenesQuery,
+  useGetArtefactsQuery,
 } from "@/store/api";
-import { EmbeddingNetwork } from "@/services/graph/interface";
+import { EmbeddingNetwork, GraphNode } from "@/services/graph/interface";
 import dynamic from "next/dynamic";
 import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
+import { Embedding, EmbeddingId } from "@/types/embedding";
 
-// Dynamically import MapButton with no SSR
 const MapButton = dynamic(() => import("@/components/MapButton"), {
   ssr: false,
 });
 
-function LoadingState() {
+function LoadingState(): JSX.Element {
   return (
     <div className="w-full h-screen flex justify-center items-center">
       <div className="animate-pulse space-y-8 w-full max-w-2xl">
@@ -26,103 +27,77 @@ function LoadingState() {
   );
 }
 
-export default function GalleryRoom() {
+export default function GalleryRoom(): JSX.Element {
   const { data: embeddings, isLoading: embeddingsLoading } =
     useGetEmbeddingsQuery();
+  const { data: artefacts, isLoading: artefactsLoading } =
+    useGetArtefactsQuery();
   const { data: scenes, isLoading: scenesLoading } = useGetScenesQuery();
   const { data: generations, isLoading: generationsLoading } =
     useGetGenerationsQuery();
-  const [currentNetwork, setCurrentNetwork] =
-    React.useState<EmbeddingNetwork | null>(null);
-  const [isVisible, setIsVisible] = React.useState(true);
-  const [lastMouseMove, setLastMouseMove] = React.useState(Date.now());
 
-  // Initialize network when data is available
-  React.useEffect(() => {
-    if (embeddings?.length && scenes?.length) {
-      const randomIndex = Math.floor(Math.random() * embeddings.length);
-      const network = buildDirectedNetwork(
-        embeddings[randomIndex],
+  const [fullNetwork, setFullNetwork] = useState<EmbeddingNetwork | null>(null);
+  const [currentNodeId, setCurrentNodeId] = useState<EmbeddingId | null>(null);
+
+  useEffect(() => {
+    if (embeddings && embeddings.length > 0 && scenes && scenes.length > 0) {
+      const randomIndex: number = Math.floor(Math.random() * embeddings.length);
+      const chosenEmbedding: Embedding = embeddings[randomIndex];
+      setCurrentNodeId(chosenEmbedding.id);
+      const network: EmbeddingNetwork = buildDirectedNetwork(
+        chosenEmbedding,
         embeddings,
         scenes,
         3,
         0.5
       );
-      setCurrentNetwork(network);
+      setFullNetwork(network);
     }
   }, [embeddings, scenes]);
 
-  // Handle auto-hide behavior
-  React.useEffect(() => {
-    const handleMouseMove = () => {
-      setIsVisible(true);
-      setLastMouseMove(Date.now());
-    };
-
-    const checkMouseIdle = () => {
-      if (Date.now() - lastMouseMove > 2000) {
-        setIsVisible(false);
-      }
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    const interval = setInterval(checkMouseIdle, 500);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      clearInterval(interval);
-    };
-  }, [lastMouseMove]);
-
-  // Always show loading state on first render to match SSR
-  const [isFirstRender, setIsFirstRender] = React.useState(true);
-
-  React.useEffect(() => {
-    setIsFirstRender(false);
+  const handleNodeChange = useCallback((node: GraphNode): void => {
+    setCurrentNodeId(node.id);
   }, []);
 
-  // Show loading state on first render or while data is loading
   if (
-    isFirstRender ||
     embeddingsLoading ||
     scenesLoading ||
-    generationsLoading
+    generationsLoading ||
+    artefactsLoading ||
+    !fullNetwork ||
+    !currentNodeId ||
+    !embeddings ||
+    !generations ||
+    !scenes ||
+    !artefacts
   ) {
     return <LoadingState />;
   }
-
-  // Show not found if data is missing after loading
-  if (!embeddings?.length || !scenes?.length || !generations?.length) {
-    return (
-      <div className="w-full h-screen flex justify-center items-center">
-        <div>No content available</div>
-      </div>
-    );
+  const artefact = artefacts.find((a) => a.embedding === currentNodeId);
+  if (!artefact) {
+    console.error("No artefact found for current node id", currentNodeId);
+    return <LoadingState />;
   }
 
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 container mx-auto px-4 py-8">
         <Gallery
-          embedding={embeddings[0]}
+          fullNetwork={fullNetwork}
+          currentNodeId={currentNodeId}
           embeddings={embeddings}
           generations={generations}
+          artefacts={artefacts}
           scenes={scenes}
-          THRESHOLD={0.5}
-          onNetworkChange={setCurrentNetwork}
+          onNodeChange={handleNodeChange}
         />
-        {currentNetwork && (
-          <MapButton
-            isVisible={isVisible}
-            onClick={() => {
-              console.log("Map button clicked, network data:", {
-                nodes: currentNetwork.nodes?.length,
-                edges: currentNetwork.edges?.length,
-              });
-            }}
-            data={currentNetwork}
-          />
-        )}
+        <MapButton
+          isVisible={true}
+          data={fullNetwork}
+          currentNodeId={currentNodeId}
+          setSelectedNode={handleNodeChange}
+          artefact={artefact}
+        />
       </main>
     </div>
   );

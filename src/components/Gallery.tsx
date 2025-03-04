@@ -1,184 +1,235 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import * as THREE from "three";
 import { createGalleryEnvironment } from "../services/gallery/createGalleryEnvironment";
-import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
-import { Embedding } from "@/types/embedding";
-import { EmbeddingNetwork } from "@/services/graph/interface";
-import { Scene } from "@/types/scene";
+import {
+  EmbeddingNetwork,
+  GraphEdge,
+  GraphNode,
+} from "@/services/graph/interface";
+import { Scene, SceneId } from "@/types/scene";
 import { Generation } from "@/types/generation";
+import { Embedding, EmbeddingId } from "@/types/embedding";
+import { Artefact } from "@/types/artefact";
 
 interface GalleryProps {
-  embedding: Embedding;
+  fullNetwork: EmbeddingNetwork;
+  currentNodeId: string;
   embeddings: Embedding[];
   generations: Generation[];
+  artefacts: Artefact[];
   scenes: Scene[];
-  THRESHOLD: number;
-  onNetworkChange: (network: EmbeddingNetwork) => void;
+  onNodeChange: (node: GraphNode) => void;
 }
 
 const Gallery: React.FC<GalleryProps> = ({
-  embedding,
+  fullNetwork,
+  currentNodeId,
   embeddings,
   generations,
+  artefacts,
   scenes,
-  THRESHOLD,
-  onNetworkChange,
+  onNodeChange,
 }) => {
-  // 1️⃣ Build the FULL network ONCE
-  const [fullNetwork] = useState<EmbeddingNetwork>(() =>
-    buildDirectedNetwork(embedding, embeddings, scenes, 3, THRESHOLD)
-  );
-
-  // 2️⃣ Sub-network: Start with ONLY the first screen
-  const [currentNetwork, setCurrentNetwork] = useState<EmbeddingNetwork>(() => {
-    const centerNode = fullNetwork.nodes.find((n) => n.id === embedding.id);
-    return centerNode
-      ? { nodes: [centerNode], edges: [] }
-      : { nodes: [], edges: [] };
-  });
-
   const mountRef = useRef<HTMLDivElement>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera>(null);
-  const galleryGroupRef = useRef<THREE.Group>(null);
-  const raycaster = React.useMemo(() => new THREE.Raycaster(), []);
-  const mouse = React.useMemo(() => new THREE.Vector2(), []);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const galleryGroupRef = useRef<THREE.Group | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const raycaster = useRef(new THREE.Raycaster()).current;
+  const mouse = useRef(new THREE.Vector2()).current;
+  const creationCount = useRef(0);
 
-  // 3️⃣ Get the connected screens (up to 3)
-  const getSubNetwork = useCallback(
-    (centralNodeId: string, maxNeighbors: number = 2) => {
-      const centerNode = fullNetwork.nodes.find((n) => n.id === centralNodeId);
-      if (!centerNode) return { nodes: [], edges: [] };
-
-      const outEdges = fullNetwork.edges.filter(
-        (e) => e.source === centralNodeId
-      );
-      outEdges.sort((a, b) => b.similarity - a.similarity);
-
-      const topEdges = outEdges.slice(0, maxNeighbors);
-      const neighborIds = new Set(topEdges.map((e) => e.target));
-
-      const subNodes = fullNetwork.nodes.filter(
-        (n) => n.id === centralNodeId || neighborIds.has(n.id)
-      );
-
-      const subEdges = fullNetwork.edges.filter(
-        (e) =>
-          subNodes.some((sn) => sn.id === e.source) &&
-          subNodes.some((sn) => sn.id === e.target)
-      );
-
-      return { nodes: subNodes, edges: subEdges };
-    },
-    [fullNetwork]
-  );
-
-  // 4️⃣ Handle Click: Remove current screen and show the next ones
   const onClick = useCallback(
-    (event: MouseEvent) => {
-      console.log("onClick");
+    (event: MouseEvent): void => {
+      console.log("clicked", currentNodeId, fullNetwork);
+
       if (!cameraRef.current || !galleryGroupRef.current) return;
 
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, cameraRef.current);
+
       const intersects = raycaster.intersectObjects(
         galleryGroupRef.current.children,
         true
       );
 
-      if (intersects.length > 0) {
-        let clickedObject: THREE.Object3D | null = intersects[0].object;
-        console.log("Found intersected object:", clickedObject);
+      // Early return if no intersection
+      if (!intersects.length) return;
 
-        while (clickedObject && !clickedObject.userData.scene) {
-          clickedObject = clickedObject.parent;
-        }
+      // Find the first object with scene data
+      const findSceneObject = (
+        obj: THREE.Object3D | null
+      ): THREE.Object3D | null => {
+        if (!obj) return null;
+        if (obj.userData.scene) return obj;
+        return findSceneObject(obj.parent);
+      };
 
-        if (clickedObject?.userData.scene) {
-          const clickedScene = clickedObject.userData.scene;
-          console.log("Clicked scene:", clickedScene);
+      const sceneObject = findSceneObject(intersects[0].object);
+      if (!sceneObject) return;
 
-          // Find the corresponding embedding for this scene
-          const clickedEmbedding = embeddings.find(
-            (e) => e.artefactId === clickedScene.artefact
-          );
+      // Use optional chaining and find operations
+      const clickedNode = fullNetwork.nodes.find(
+        (node) =>
+          node.id ===
+          embeddings.find(
+            (e) => e.artefactId === sceneObject.userData.scene.artefact
+          )?.id
+      );
 
-          if (clickedEmbedding) {
-            console.log("Found corresponding embedding:", clickedEmbedding);
-            const nextSubNetwork = getSubNetwork(clickedEmbedding.id, 2);
-            console.log("nextSubNetwork", nextSubNetwork);
-            setCurrentNetwork(nextSubNetwork);
-            onNetworkChange?.(nextSubNetwork);
-          } else {
-            console.warn("No embedding found for scene:", clickedScene);
-          }
-        } else {
-          console.log("No scene data found on clicked object");
-        }
+      // If we have a node, trigger the change
+      if (clickedNode) {
+        onNodeChange(clickedNode);
       }
     },
-    [getSubNetwork, mouse, raycaster, embeddings, onNetworkChange]
+    [mouse, raycaster, embeddings, onNodeChange, fullNetwork]
   );
 
-  // 5️⃣ Update Scene: Rebuild whenever `currentNetwork` changes
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
 
+    // Log when this effect runs
+    console.log("Gallery environment effect running", {
+      currentNodeId,
+      sceneCount: scenes?.length,
+      mapButtonClicked: document.querySelector(".network-container") !== null,
+      creationCount: ++creationCount.current,
+    });
+
+    // **🔹 Clear old renderer if it exists**
+    if (rendererRef.current) {
+      console.log("Disposing previous renderer");
+      rendererRef.current.dispose();
+      rendererRef.current.domElement.remove();
+    }
+
+    // **🔹 Set up Three.js**
     const width = mount.clientWidth || window.innerWidth;
     const height = mount.clientHeight || window.innerHeight;
 
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
+
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setClearColor(0x000000, 1);
     renderer.setSize(width, height);
+    renderer.setClearColor(0x000000, 1);
+    rendererRef.current = renderer;
+
     mount.appendChild(renderer.domElement);
 
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    cameraRef.current = camera;
     camera.position.set(0, 0, 8);
     camera.lookAt(0, 0, 0);
+    cameraRef.current = camera;
 
-    const currentScenes = scenes.filter((scene) =>
-      currentNetwork.nodes.some((node) => node.artefact === scene.id)
+    console.log("fullNetwork", fullNetwork);
+    console.log("currentNodeId", currentNodeId);
+    console.log(
+      "current node",
+      fullNetwork.nodes.find((n) => n.id === currentNodeId)
     );
 
-    console.log("Creating gallery environment with scenes:", currentScenes);
+    // Add detailed logging before filtering
+    console.log("fullNetwork", fullNetwork);
+    console.log("currentNodeId", currentNodeId);
+    console.log(
+      "current node",
+      fullNetwork.nodes.find((n) => n.id === currentNodeId)
+    );
+
+    // The key fix - modify your filtering to handle both string and object references
+    const embeddingIds: EmbeddingId[] = fullNetwork.edges
+      .filter((edge: GraphEdge) => {
+        // Convert both to string to handle potential object/string mismatch
+        const sourceId =
+          typeof edge.source === "object"
+            ? (edge.source as GraphNode).id
+            : edge.source.toString();
+
+        console.log(
+          `Comparing edge source ${sourceId} with currentNodeId ${currentNodeId}`
+        );
+        return sourceId === currentNodeId;
+      })
+      .map((edge: GraphEdge) => {
+        // Also handle target in the same way
+        return typeof edge.target === "object"
+          ? (edge.target as GraphNode).id
+          : (edge.target as EmbeddingId);
+      });
+
+    console.log("embeddingIds", embeddingIds);
+    const filteredEmbeddings = embeddings.filter((e) =>
+      embeddingIds.includes(e.id)
+    );
+    console.log("filteredEmbeddings", filteredEmbeddings);
+    const filteredArtefacts = artefacts.filter((a) =>
+      filteredEmbeddings.some((e) => e.artefactId === a.id)
+    );
+    console.log("filteredArtefacts", filteredArtefacts);
+    const sceneIds: SceneId[] = [];
+    filteredArtefacts.forEach((a) => {
+      const scene = scenes.find((s) => s.artefact === a.id);
+      if (scene) {
+        sceneIds.push(scene.id);
+      }
+    });
+    console.log("sceneIds", sceneIds);
+    const currentScenes = scenes.filter((sc) => sceneIds.includes(sc.id));
+
+    // Log before gallery creation
+    console.log("Creating gallery environment", {
+      currentScenes: currentScenes?.length,
+      nodeId: currentNodeId,
+    });
+
     const galleryGroup = createGalleryEnvironment(currentScenes, generations);
     galleryGroupRef.current = galleryGroup;
     scene.add(galleryGroup);
 
+    // Log after gallery creation
+    console.log("Gallery environment created", {
+      objectCount: galleryGroup.children.length,
+    });
+
     renderer.domElement.addEventListener("click", onClick);
 
-    const animate = () => {
+    // **🔹 Animation Loop**
+    const animate = (): void => {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     };
     animate();
 
     return () => {
-      // Cleanup previous screens
-      scene.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-          if (object.material instanceof THREE.MeshBasicMaterial) {
-            if (object.material.map) {
-              object.material.map.dispose();
-            }
-            object.material.dispose();
-          }
-          if (object.geometry) {
-            object.geometry.dispose();
-          }
+      console.log("Gallery environment cleanup");
+      // **🔹 Cleanup on component unmount**
+      if (renderer) {
+        renderer.dispose();
+        if (mount.contains(renderer.domElement)) {
+          mount.removeChild(renderer.domElement);
         }
-      });
+      }
 
-      scene.clear();
-      mount.removeChild(renderer.domElement);
-      renderer.dispose();
+      if (scene) {
+        scene.clear();
+      }
+
+      renderer.domElement.removeEventListener("click", onClick);
     };
-  }, [currentNetwork, , scenes, generations, onClick]);
+  }, [
+    scenes,
+    generations,
+    onClick,
+    artefacts,
+    embeddings,
+    currentNodeId,
+    fullNetwork,
+  ]);
 
   return <div ref={mountRef} className="w-full h-screen cursor-pointer" />;
 };
