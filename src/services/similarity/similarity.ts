@@ -10,7 +10,6 @@ import { Embedding } from "@/types/embedding";
  * @returns A number in the range [-1, 1], where higher means more similar.
  */
 export const cosineSimilarity = (vecA: number[], vecB: number[]): number => {
-  console.log("Performing cosine similarity");
   if (vecA.length !== vecB.length) {
     throw new Error("Vector size mismatch in cosineSimilarity()");
   }
@@ -49,7 +48,6 @@ export const findTopMatches = (
 ): Array<Embedding & { similarity: number }> => {
   // Compute similarities
   const scored = existingEmbeddings.map((item) => {
-    console.log("item", item);
     const similarity = cosineSimilarity(queryEmbedding.vector, item.vector);
     return {
       ...item,

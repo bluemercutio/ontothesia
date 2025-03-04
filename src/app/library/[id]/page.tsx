@@ -3,7 +3,11 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { Network } from "@/components/Network";
-import { useGetArtefactByIdQuery, useGetEmbeddingsQuery } from "@/store/api";
+import {
+  useGetArtefactByIdQuery,
+  useGetEmbeddingsQuery,
+  useGetScenesQuery,
+} from "@/store/api";
 import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
 import Link from "next/link";
 
@@ -20,6 +24,8 @@ export default function ArtefactPage() {
     error: artefactError,
   } = useGetArtefactByIdQuery(typeof id === "string" ? id : "");
 
+  const { data: scenes, isLoading: scenesLoading } = useGetScenesQuery();
+
   const { data: embeddings, isLoading: embeddingsLoading } =
     useGetEmbeddingsQuery();
 
@@ -30,15 +36,17 @@ export default function ArtefactPage() {
   const directedEmbeddingNetwork = React.useMemo(() => {
     if (!artefact || !embeddings) return null;
 
+    if (!scenes) return null;
+
     // Find the embedding for this artefact
     const embedding = embeddings.find((e) => e.id === `${id}-embedding`);
     if (!embedding) return null;
 
     const THRESHOLD = 0.8;
-    return buildDirectedNetwork(embedding, embeddings, 3, THRESHOLD);
-  }, [artefact, embeddings, id]);
+    return buildDirectedNetwork(embedding, embeddings, scenes, THRESHOLD);
+  }, [artefact, embeddings, id, scenes]);
 
-  const isLoading = artefactLoading || embeddingsLoading;
+  const isLoading = artefactLoading || embeddingsLoading || scenesLoading;
 
   if (isLoading) {
     return (

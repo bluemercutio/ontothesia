@@ -2,12 +2,19 @@
 
 import React, { memo } from "react";
 import styled from "styled-components";
+import { usePathname } from "next/navigation";
+import MapButton from "./MapButton";
+import { EmbeddingNetwork } from "../services/graph/interface";
 
 interface NavItemProps {
   $isActive?: boolean;
 }
 
-const NavContainer = styled.nav`
+interface NavContainerProps {
+  $isVisible?: boolean;
+}
+
+const NavContainer = styled.nav<NavContainerProps>`
   position: fixed;
   bottom: 20px;
   left: 50%;
@@ -20,6 +27,8 @@ const NavContainer = styled.nav`
   display: flex;
   gap: 24px;
   z-index: 1000;
+  opacity: ${(props) => (props.$isVisible ? 1 : 0)};
+  transition: opacity 0.3s ease;
 `;
 
 const NavItem = styled.button<NavItemProps>`
@@ -56,31 +65,99 @@ const NavItem = styled.button<NavItemProps>`
 interface NavbarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  networkData?: EmbeddingNetwork;
 }
 
-const Navbar: React.FC<NavbarProps> = memo(({ activeTab, onTabChange }) => {
-  const tabs = [
-    { id: "home", label: "HOME" },
-    { id: "gallery", label: "GALLERY" },
-    { id: "cinema", label: "CINEMA" },
-    { id: "library", label: "LIBRARY" },
-    { id: "project", label: "PROJECT" },
-  ];
+const Navbar: React.FC<NavbarProps> = memo(
+  ({ activeTab, onTabChange, networkData }) => {
+    const pathname = usePathname();
+    const [isVisible, setIsVisible] = React.useState(true);
+    const [lastMouseMove, setLastMouseMove] = React.useState(Date.now());
 
-  return (
-    <NavContainer>
-      {tabs.map((tab) => (
-        <NavItem
-          key={tab.id}
-          $isActive={activeTab === tab.id}
-          onClick={() => onTabChange(tab.id)}
-        >
-          {tab.label}
-        </NavItem>
-      ))}
-    </NavContainer>
-  );
-});
+    React.useEffect(() => {
+      if (networkData) {
+        console.log("Network data in Navbar:", {
+          nodes: networkData.nodes?.length,
+          edges: networkData.edges?.length,
+        });
+      }
+    }, [networkData]);
+
+    // Check if current path matches the pattern /gallery/{id}/gallery or /gallery/{id}/dome
+    const shouldAutoHide = React.useMemo(() => {
+      return pathname
+        ? /^\/gallery\/[^/]+\/(gallery|dome)$/.test(pathname)
+        : false;
+    }, [pathname]);
+
+    const showMapButton = React.useMemo(() => {
+      return pathname ? /^\/gallery\/[^/]+\/gallery$/.test(pathname) : false;
+    }, [pathname]);
+
+    React.useEffect(() => {
+      if (!shouldAutoHide) {
+        setIsVisible(true);
+        return;
+      }
+
+      const handleMouseMove = () => {
+        setIsVisible(true);
+        setLastMouseMove(Date.now());
+      };
+
+      const checkMouseIdle = () => {
+        if (Date.now() - lastMouseMove > 2000) {
+          // 2 seconds delay
+          setIsVisible(false);
+        }
+      };
+
+      window.addEventListener("mousemove", handleMouseMove);
+      const interval = setInterval(checkMouseIdle, 500);
+
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        clearInterval(interval);
+      };
+    }, [shouldAutoHide, lastMouseMove]);
+
+    const tabs = [
+      { id: "home", label: "HOME" },
+      { id: "gallery", label: "GALLERY" },
+      // { id: "cinema", label: "CINEMA" },
+      { id: "library", label: "LIBRARY" },
+      { id: "project", label: "PROJECT" },
+    ];
+
+    return (
+      <>
+        <NavContainer $isVisible={!shouldAutoHide || isVisible}>
+          {tabs.map((tab) => (
+            <NavItem
+              key={tab.id}
+              $isActive={activeTab === tab.id}
+              onClick={() => onTabChange(tab.id)}
+            >
+              {tab.label}
+            </NavItem>
+          ))}
+        </NavContainer>
+        {showMapButton && networkData && (
+          <MapButton
+            $isVisible={!shouldAutoHide || isVisible}
+            onClick={() => {
+              console.log("Map button clicked, network data:", {
+                nodes: networkData.nodes?.length,
+                edges: networkData.edges?.length,
+              });
+            }}
+            data={networkData}
+          />
+        )}
+      </>
+    );
+  }
+);
 
 Navbar.displayName = "Navbar";
 

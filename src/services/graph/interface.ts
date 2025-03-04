@@ -1,15 +1,16 @@
 import { ArtefactId } from "@/types/artefact";
+import { EmbeddingId } from "@/types/embedding";
 
 export interface GraphNode {
-  id: string;
-  label: string;
+  id: EmbeddingId;
+  label: EmbeddingId;
   artefact: ArtefactId;
   // Optional: You can store extra fields, e.g. group, color, etc.
 }
 
 export interface GraphEdge {
-  source: string;
-  target: string;
+  source: EmbeddingId;
+  target: EmbeddingId;
   similarity: number;
   // Optional: directed edges, styling info, etc.
 }
