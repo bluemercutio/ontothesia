@@ -47,9 +47,8 @@ export default function GalleryRoom(): JSX.Element {
       const network: EmbeddingNetwork = buildDirectedNetwork(
         chosenEmbedding,
         embeddings,
-        scenes,
         3,
-        0.5
+        0.8
       );
       setFullNetwork(network);
     }

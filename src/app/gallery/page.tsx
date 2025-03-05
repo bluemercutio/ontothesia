@@ -4,12 +4,40 @@ import React from "react";
 import Card from "@/components/Card";
 import Carousel from "@/components/Carousel";
 import Header from "@/components/Header";
-import { useGetExperiencesQuery } from "@/store/api";
+import { useGetExperiencesQuery, useGetGenerationsQuery } from "@/store/api";
 import { useRouter } from "next/navigation";
-
+import { Generation } from "@/types/generation";
+import { getImageUrlForGeneration } from "@/services/utils/generations";
+import { SceneId } from "@/types/scene";
 export default function Gallery() {
   const router = useRouter();
   const { data: experiences, isLoading, error } = useGetExperiencesQuery();
+  const {
+    data: generations,
+    isLoading: isLoadingGenerations,
+    error: errorGenerations,
+  } = useGetGenerationsQuery();
+
+  if (!experiences) return null;
+  const sceneIds: SceneId[] = experiences.flatMap(
+    (experience) => experience.scenes
+  );
+  console.log("sceneIds", sceneIds);
+
+  if (isLoadingGenerations || errorGenerations || !generations) return null;
+
+  const filteredGenerations = generations.filter((generation: Generation) =>
+    sceneIds.includes(generation.scene)
+  );
+
+  const imageUrls = filteredGenerations.map((generation) =>
+    getImageUrlForGeneration(generation)
+  );
+
+  const getRandomImageUrls = (urls: string[], count: number) => {
+    const shuffled = urls.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
 
   // Always maintain the same base layout structure
   return (
@@ -61,7 +89,7 @@ export default function Gallery() {
                     <Card
                       title={item.title}
                       description={item.description}
-                      imageUrl={item.image_url}
+                      imageUrls={getRandomImageUrls(imageUrls, 8)}
                       width="w-96"
                       height="h-96"
                     />

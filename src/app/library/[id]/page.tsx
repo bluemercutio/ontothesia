@@ -42,8 +42,9 @@ export default function ArtefactPage() {
     const embedding = embeddings.find((e) => e.id === `${id}-embedding`);
     if (!embedding) return null;
 
-    const THRESHOLD = 0.8;
-    return buildDirectedNetwork(embedding, embeddings, scenes, THRESHOLD);
+    const network = buildDirectedNetwork(embedding, embeddings, 3, 0.8);
+    console.log("NETWORK", network);
+    return network;
   }, [artefact, embeddings, id, scenes]);
 
   const isLoading = artefactLoading || embeddingsLoading || scenesLoading;
@@ -124,9 +125,11 @@ export default function ArtefactPage() {
                 </h4>
                 <Network
                   data={directedEmbeddingNetwork}
-                  startingNode={`${id}-embedding`}
                   width={896}
                   height={600}
+                  currentNodeId={`${id}-embedding`}
+                  setSelectedNode={() => {}}
+                  artefact={artefact}
                 />
               </div>
             </div>

@@ -6,6 +6,7 @@ interface CardProps {
   description?: string;
   text?: string;
   imageUrl?: string;
+  imageUrls?: string[];
   width?: string;
   height?: string;
   component?: React.ReactNode;
@@ -15,6 +16,7 @@ const Card: React.FC<CardProps> = ({
   title,
   text,
   imageUrl,
+  imageUrls,
   width,
   height,
   component,
@@ -26,7 +28,31 @@ const Card: React.FC<CardProps> = ({
       } overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col`}
       style={{ background: "var(none)" }}
     >
-      {imageUrl && (
+      {imageUrls && imageUrls.length > 0 ? (
+        <div className="w-full aspect-square relative flex">
+          {imageUrls.map((url, index) => (
+            <div
+              key={index}
+              className="h-full flex-1 relative"
+              style={{
+                borderRight:
+                  index < imageUrls.length - 1
+                    ? "1px solid rgba(255,255,255,0.2)"
+                    : "none",
+              }}
+            >
+              <Image
+                src={url}
+                alt={`${title} scene ${index + 1}`}
+                width={1024}
+                height={1024}
+                className="object-cover w-full h-full"
+                priority={index === 0}
+              />
+            </div>
+          ))}
+        </div>
+      ) : imageUrl ? (
         <div className="w-full aspect-square relative">
           <Image
             src={imageUrl}
@@ -37,7 +63,7 @@ const Card: React.FC<CardProps> = ({
             priority
           />
         </div>
-      )}
+      ) : null}
       <div className="p-4 flex-1 flex flex-col">
         {component && <div className="mt-2">{component}</div>}
         {text && <p className="text-gray-600 text-sm mt-auto">{text}</p>}

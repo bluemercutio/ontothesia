@@ -1,12 +1,10 @@
 import { Embedding } from "@/types/embedding";
 import { findTopMatches } from "@/services/similarity/similarity";
 import { GraphNode, GraphEdge, EmbeddingNetwork } from "./interface";
-import { Scene } from "@/types/scene";
 
 export const buildDirectedNetwork = (
   startingEmbedding: Embedding,
   embeddings: Embedding[],
-  scenes: Scene[],
   topN: number,
   minSimilarity: number = 0.5
 ): EmbeddingNetwork => {
