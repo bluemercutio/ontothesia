@@ -168,7 +168,7 @@ const createExperienceWithScenes = (
 };
 
 const main = async () => {
-  const PROMPT_INDEX: number = 4;
+  const PROMPT_INDEX: number = 6;
   if (!process.env.PRISMA_DIR) {
     throw new Error("PRISMA_DIR is not set");
   }

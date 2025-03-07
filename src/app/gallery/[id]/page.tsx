@@ -43,7 +43,7 @@ export default function GalleryOptions() {
           {/* Left side description */}
           <div className="flex-1 max-w-md">
             <h1 className="text-2xl font-bold mb-4">{experience.title}</h1>
-            <p className="text-lg">{experience.description}</p>
+            <p className="text-lg pb-10">{experience.description}</p>
             <Card
               imageUrls={getRandomImageUrls(
                 experienceGenerations[experience.id] || [],

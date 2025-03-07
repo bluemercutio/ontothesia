@@ -32,7 +32,7 @@ export default function Gallery() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header title="Gallery" />
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4">
         {isLoading ? (
           // Loading state that matches the layout
           <div className="flex-1 flex flex-col">
@@ -68,7 +68,7 @@ export default function Gallery() {
         ) : (
           // Content when data is available
           <>
-            <div className="flex-1 flex flex-col justify-center items-center min-h-screen">
+            <div className="h-[calc(100vh-theme(spacing.16))] flex flex-col items-center justify-center">
               <Carousel>
                 {experiences.map((item) => (
                   <div
@@ -91,9 +91,32 @@ export default function Gallery() {
                   </div>
                 ))}
               </Carousel>
+              <button
+                onClick={() => {
+                  document.getElementById("catalogue")?.scrollIntoView({
+                    behavior: "smooth",
+                  });
+                }}
+                className="mt-8 pt-10 text-lg hover:underline cursor-pointer flex items-center gap-2"
+              >
+                View Catalogue
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                  />
+                </svg>
+              </button>
             </div>
 
-            <div className="min-h-screen pt-24">
+            <div id="catalogue" className="min-h-screen pt-24">
               <h2 className="text-3xl text-center mb-8">Catalogue</h2>
               <div className="flex flex-wrap justify-center gap-4">
                 {(experiences || []).map((item, index) => (
@@ -101,7 +124,11 @@ export default function Gallery() {
                     key={`flex-${index}`}
                     title={item.title}
                     description={item.description}
-                    imageUrl={item.image_url}
+                    // imageUrl={item.image_url}
+                    imageUrls={getRandomImageUrls(
+                      experienceGenerations[item.id] || [],
+                      8
+                    )}
                     width="w-32"
                     height="h-48"
                   />

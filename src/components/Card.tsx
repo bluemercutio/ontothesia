@@ -66,7 +66,7 @@ const Card: React.FC<CardProps> = ({
       ) : null}
       <div className=" flex-1 flex flex-col">
         {title && <h3 className="text-lg ">{title}</h3>}
-        {text && <p className="text-gray-600 text-sm ">{text}</p>}
+        {text && <p className="text-white text-sm mt-5 ">{text}</p>}
 
         {component && <div className="mt-2">{component}</div>}
       </div>
