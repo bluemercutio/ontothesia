@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface CarouselProps {
   children: React.ReactNode[];
@@ -7,6 +7,25 @@ interface CarouselProps {
 const Carousel: React.FC<CarouselProps> = ({ children }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const totalItems = React.Children.count(children);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [slideWidth, setSlideWidth] = useState(0);
+
+  useEffect(() => {
+    const updateSlideWidth = () => {
+      if (containerRef.current) {
+        const firstSlide = containerRef.current
+          .firstElementChild as HTMLElement;
+        if (firstSlide) {
+          // Include the gap in the slide width calculation (24px = gap-6)
+          setSlideWidth(firstSlide.offsetWidth + 24);
+        }
+      }
+    };
+
+    updateSlideWidth();
+    window.addEventListener("resize", updateSlideWidth);
+    return () => window.removeEventListener("resize", updateSlideWidth);
+  }, []);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) =>
@@ -24,8 +43,9 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
     <div className="relative mx-auto w-full max-w-4xl px-12">
       <div className="overflow-hidden">
         <div
+          ref={containerRef}
           className="transition-transform duration-500 ease-in-out flex gap-6"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+          style={{ transform: `translateX(-${currentIndex * slideWidth}px)` }}
         >
           {React.Children.map(children, (child) => (
             <div className="w-full flex-shrink-0">
