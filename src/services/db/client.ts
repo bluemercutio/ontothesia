@@ -6,7 +6,7 @@ import { Artefact, ArtefactId } from "../../types/artefact";
 import { Scene, SceneId } from "../../types/scene";
 import { Experience, ExperienceId } from "../../types/experience";
 import { Embedding, EmbeddingId } from "@/types/embedding";
-import crypto from "crypto";
+import { v4 as uuidv4 } from "uuid";
 import { Generation } from "@/types/generation";
 const prisma = new PrismaClient();
 
@@ -17,7 +17,7 @@ export const dbService: DBService = {
   createArtefact: async (data: Omit<Artefact, "id">): Promise<Artefact> => {
     const created = await prisma.artefact.create({
       data: {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         title: data.title,
         text: data.text,
         region: data.region,
@@ -95,12 +95,21 @@ export const dbService: DBService = {
   // ───────────────────────────────────────────────────────────────────
   // SCENE
   // ───────────────────────────────────────────────────────────────────
-  createScene: async (data: Omit<Scene, "id">): Promise<Scene> => {
-    const { artefact: artefactId, ...rest } = data;
+  createScene: async (data: Scene): Promise<Scene> => {
+    const {
+      artefact: artefactId,
+      experience: experienceId,
+      generation,
+      ...rest
+    } = data;
     const created = await prisma.scene.create({
       data: {
         ...rest,
         artefactId,
+        experienceId,
+        generation: {
+          connect: { id: generation },
+        },
       },
       include: {
         artefact: true,
@@ -108,48 +117,69 @@ export const dbService: DBService = {
     });
     return {
       ...created,
-      artefact: created.artefactId,
+      artefact: created.artefactId || "",
+      experience: created.experienceId || "",
+      generation: generation || "",
+      video_url: created.video_url || "",
     };
   },
   getSceneById: async (id: SceneId): Promise<Scene | null> => {
     const scene = await prisma.scene.findUnique({
       where: { id },
       include: {
-        artefact: true,
+        generation: true,
       },
     });
     if (!scene) return null;
     return {
       ...scene,
       artefact: scene.artefactId,
+      experience: scene.experienceId || "",
+      video_url: scene.video_url || "",
+      generation: scene.generation?.id || "",
     };
   },
   getAllScenes: async (): Promise<Scene[]> => {
     const scenes = await prisma.scene.findMany({
       include: {
         artefact: true,
+        generation: true,
       },
     });
     return scenes.map((scene) => ({
       ...scene,
       artefact: scene.artefactId,
+      experience: scene.experienceId || "",
+      video_url: scene.video_url || "",
+      generation: scene.generation?.id || "",
     }));
   },
   updateScene: async (id: SceneId, data: Partial<Scene>): Promise<Scene> => {
-    const { artefact: artefactId, ...rest } = data;
+    const {
+      artefact: artefactId,
+      experience: experienceId,
+      generation,
+      ...rest
+    } = data;
     const updated = await prisma.scene.update({
       where: { id },
       data: {
         ...rest,
         ...(artefactId && { artefactId }),
+        ...(experienceId && { experienceId }),
+        ...(generation && { generation: { connect: { id: generation } } }),
       },
       include: {
         artefact: true,
+        generation: true,
       },
     });
     return {
       ...updated,
-      artefact: updated.artefactId,
+      artefact: updated.artefactId || "",
+      experience: updated.experienceId || "",
+      generation: updated.generation?.id || "",
+      video_url: updated.video_url || "",
     };
   },
   deleteScene: async (id: SceneId): Promise<Scene> => {
@@ -157,11 +187,15 @@ export const dbService: DBService = {
       where: { id },
       include: {
         artefact: true,
+        generation: true,
       },
     });
     return {
       ...deleted,
-      artefact: deleted.artefactId,
+      artefact: deleted.artefactId || "",
+      experience: deleted.experienceId || "",
+      video_url: deleted.video_url || "",
+      generation: deleted.generation?.id || "",
     };
   },
 

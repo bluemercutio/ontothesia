@@ -1,5 +1,6 @@
 import { ArtefactId } from "./artefact";
-
+import { ExperienceId } from "./experience";
+import { GenerationId } from "./generation";
 export type SceneId = string;
 
 export interface Scene {
@@ -10,4 +11,6 @@ export interface Scene {
   image_url: string;
   video_url: string;
   visualisation: string;
+  experience: ExperienceId;
+  generation: GenerationId;
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import {
   EmbeddingNetwork,
@@ -17,7 +17,7 @@ type NetworkProps = {
   width?: number;
   height?: number;
   currentNodeId: string;
-  setSelectedNode: (node: GraphNode) => void;
+  handleSelectedNode: (node: GraphNode) => void;
   artefact: Artefact;
 };
 
@@ -26,20 +26,23 @@ export const Network: React.FC<NetworkProps> = ({
   width = 800,
   height = 600,
   currentNodeId,
-  setSelectedNode,
+  handleSelectedNode,
   artefact,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const [currentNode, setCurrentNode] = useState<GraphNode | null>(null);
+  useEffect(() => {
+    const foundNode = data.nodes.find((n) => n.id === currentNodeId);
+    setCurrentNode(foundNode ?? null);
+  }, [currentNodeId, data.nodes]);
 
   if (!artefact) {
     throw new Error("No artefact");
   }
 
-  console.log("Artefact:", artefact.title);
-
   useEffect(() => {
     if (!data || !data.nodes || !data.edges) {
-      console.log("No data");
+      console.error("No data");
       return;
     }
 
@@ -111,7 +114,7 @@ export const Network: React.FC<NetworkProps> = ({
       .on("click", (event, d) => {
         // Stop propagation of this specific click
         event.stopPropagation();
-        setSelectedNode(d);
+        handleSelectedNode(d);
       });
 
     // Modify how the SVG captures events
@@ -123,7 +126,7 @@ export const Network: React.FC<NetworkProps> = ({
     //   event.stopPropagation();
 
     //   // Your existing node selection logic
-    //   setSelectedNode(data.nodes[0]);
+    //   handleSelectedNode(data.nodes[0]);
     // });
 
     simulation.on("tick", () => {
@@ -137,14 +140,11 @@ export const Network: React.FC<NetworkProps> = ({
 
       node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
     });
-  }, [data, width, height, currentNodeId, setSelectedNode]);
+  }, [data, width, height, currentNodeId, handleSelectedNode]);
 
-  const handleNodeSelect = (nodeId: string) => {
-    const node = data.nodes.find((n) => n.id === nodeId);
-    if (node) {
-      setSelectedNode(node);
-    }
-  };
+  // const handleNodeSelect = (node: GraphNode) => {
+  //   handleSelectedNode(node);
+  // };
 
   return (
     <div className="flex justify-center w-full relative">
@@ -154,11 +154,7 @@ export const Network: React.FC<NetworkProps> = ({
           top: "-40px", // This positions the overlay higher
         }}
       >
-        <NetworkOverlay
-          selectedNode={data.nodes.find((n) => n.id === currentNodeId) ?? null}
-          artefact={artefact ?? null}
-          onNodeSelect={handleNodeSelect}
-        />
+        <NetworkOverlay selectedNode={currentNode} artefact={artefact} />
       </div>
       <svg
         ref={svgRef}

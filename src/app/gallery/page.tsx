@@ -6,9 +6,10 @@ import Carousel from "@/components/Carousel";
 import Header from "@/components/Header";
 import { useGetExperiencesQuery, useGetGenerationsQuery } from "@/store/api";
 import { useRouter } from "next/navigation";
-import { Generation } from "@/types/generation";
-import { getImageUrlForGeneration } from "@/services/utils/generations";
-import { SceneId } from "@/types/scene";
+
+import { getExperienceGenerationsMap } from "@/services/utils/generations";
+import { getRandomImageUrls } from "@/services/utils/images";
+
 export default function Gallery() {
   const router = useRouter();
   const { data: experiences, isLoading, error } = useGetExperiencesQuery();
@@ -19,25 +20,13 @@ export default function Gallery() {
   } = useGetGenerationsQuery();
 
   if (!experiences) return null;
-  const sceneIds: SceneId[] = experiences.flatMap(
-    (experience) => experience.scenes
-  );
-  console.log("sceneIds", sceneIds);
 
   if (isLoadingGenerations || errorGenerations || !generations) return null;
-
-  const filteredGenerations = generations.filter((generation: Generation) =>
-    sceneIds.includes(generation.scene)
+  // Create a map of experience ID to its scene-specific generations
+  const experienceGenerations = getExperienceGenerationsMap(
+    generations,
+    experiences
   );
-
-  const imageUrls = filteredGenerations.map((generation) =>
-    getImageUrlForGeneration(generation)
-  );
-
-  const getRandomImageUrls = (urls: string[], count: number) => {
-    const shuffled = urls.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  };
 
   // Always maintain the same base layout structure
   return (
@@ -81,15 +70,21 @@ export default function Gallery() {
           <>
             <div className="flex-1 flex flex-col justify-center items-center min-h-screen">
               <Carousel>
-                {(experiences || []).map((item) => (
+                {experiences.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => router.push(`/gallery/${item.id}`)}
+                    onClick={() => {
+                      router.push(`/gallery/${item.id}`);
+                    }}
+                    className="cursor-pointer"
                   >
                     <Card
                       title={item.title}
                       description={item.description}
-                      imageUrls={getRandomImageUrls(imageUrls, 8)}
+                      imageUrls={getRandomImageUrls(
+                        experienceGenerations[item.id] || [],
+                        8
+                      )}
                       width="w-96"
                       height="h-96"
                     />
@@ -99,9 +94,7 @@ export default function Gallery() {
             </div>
 
             <div className="min-h-screen pt-24">
-              <h2 className="text-3xl font-bold text-center mb-8">
-                Ontothesia Catalogue
-              </h2>
+              <h2 className="text-3xl text-center mb-8">Catalogue</h2>
               <div className="flex flex-wrap justify-center gap-4">
                 {(experiences || []).map((item, index) => (
                   <Card

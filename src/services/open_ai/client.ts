@@ -1,12 +1,12 @@
 import OpenAI from "openai";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 /**
  * Reads the OpenAI API key from environment variables.
  * Make sure you have OPENAI_API_KEY set in your .env (or environment).
  */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 /**
  * Creates an embedding for a given input using a specified embedding model.
@@ -18,20 +18,19 @@ const openai = new OpenAI({
 export const createEmbedding = async (
   input: string | string[],
   model = "text-embedding-ada-002"
-): Promise<number[] | number[][]> => {
+): Promise<OpenAI.Embedding[]> => {
   try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
     const response = await openai.embeddings.create({
       model,
       input,
     });
 
-    // If input is a single string, return a single embedding vector.
-    // If input is an array, return an array of embedding vectors.
-    const embeddings = response.data.map(
-      (item: { embedding: number[] }) => item.embedding
-    );
+    const embedding = response.data;
 
-    return Array.isArray(input) ? embeddings : embeddings[0];
+    return embedding;
   } catch (error) {
     // Handle error (could be logging, rethrowing, etc.)
     throw error;
@@ -48,18 +47,26 @@ export const createEmbedding = async (
  */
 export const createCompletion = async (
   prompt: string,
-  model = "text-davinci-003",
-  maxTokens = 128
+  context: string
 ): Promise<string> => {
   try {
-    const response = await openai.completions.create({
-      model,
-      prompt,
-      max_tokens: maxTokens,
-      temperature: 0.7,
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: "developer", content: context },
+        { role: "user", content: prompt },
+      ],
+      model: "gpt-4o",
+      store: true,
     });
 
-    return response.choices[0].text?.trim() ?? "";
+    const result = completion.choices[0].message.content;
+    if (!result) {
+      throw new Error("Completion Error: No result found");
+    }
+    return result;
   } catch (error) {
     // Handle error (could be logging, rethrowing, etc.)
     throw error;

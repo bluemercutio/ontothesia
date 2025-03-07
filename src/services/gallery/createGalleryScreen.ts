@@ -3,7 +3,7 @@ import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
 import { Scene } from "@/types/scene";
 import { Generation } from "@/types/generation";
 import {
-  getGenerationForScene,
+  findGenerationForScene,
   getImageUrlForGeneration,
 } from "../utils/generations";
 import { vertexShader } from "./shaders";
@@ -14,7 +14,7 @@ export const createGalleryScreen = (
   generations: Generation[]
 ): THREE.Mesh => {
   const geometry = new THREE.PlaneGeometry(SCREEN_WIDTH, SCREEN_HEIGHT);
-  const generation = getGenerationForScene(scene, generations);
+  const generation = findGenerationForScene(scene, generations);
   if (!generation) {
     throw new Error("No generation found for scene");
   }

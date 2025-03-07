@@ -1,6 +1,6 @@
 import { Scene } from "@/types/scene";
 import { createStableDiffusionGeneration } from "@/services/stable_diffusion/client";
-import { scenes } from "../prisma/scenes";
+// import { scenes } from "../prisma/scenes";
 import fs from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { artefacts } from "../prisma/artefacts";
@@ -10,6 +10,7 @@ import { Generation } from "@/types/generation";
 import path from "path";
 import axios from "axios";
 import { Artefact } from "@/types/artefact";
+import { v4 as uuidv4 } from "uuid";
 
 // Add this near the top of the file, before any code that uses process.env
 dotenv.config();
@@ -26,10 +27,13 @@ export const downloadImage = async (url: string): Promise<Buffer> => {
   return Buffer.from(buffer);
 };
 
-export const createGenerationsForScenes = async (scenes: Scene[]) => {
+export const createGenerationsForScenes = async (
+  scenes: Scene[],
+  prompt_index: number
+) => {
   try {
     const generations = scenes.map(async (scene) => {
-      const prompt = createPrompt(scene);
+      const prompt = createPrompt(scene, prompt_index);
       const generation = await createStableDiffusionGeneration(prompt);
       return generation;
     });
@@ -39,7 +43,10 @@ export const createGenerationsForScenes = async (scenes: Scene[]) => {
   }
 };
 
-const createPrompt = (scene: Scene) => {
+const createPrompt = (scene: Scene, prompt_index: number) => {
+  if (!process.env.PRISMA_DIR) {
+    throw Error("No prisma dir env found");
+  }
   const artefact = artefacts.find(
     (artefact: Artefact) => artefact.id === scene.artefact
   );
@@ -47,21 +54,18 @@ const createPrompt = (scene: Scene) => {
     throw new Error(`No artefact found for id: ${scene.artefact}`);
   }
 
+  const prompts = JSON.parse(
+    fs.readFileSync(
+      path.join(process.env.PRISMA_DIR, "../prisma/prompts.json"),
+      "utf-8"
+    )
+  );
+
   return `
-        Create an image of a scene that depicts in some way the ARTEFACT_TEXT. 
-        The CONTEXT should inform the depiction of the scene and the VISUALISATION GUIDE will inform how to depict the ARTEFACT_TEXT:
 
-        General Instructions:
-        The image should fade into a black background in a smokey way. No part of the representation should touch the borders.
-
-        You can be abstract but should only do so if the text gestures towards abstraction
-
-        Your goal is focus on a centeral subject with a clear forground and a background that disappears into black #000000
-
-        Do not create any text in the image.
-
+        ${prompts[prompt_index].prompt}
         TITLE: "${scene.title}",
-        ARTEFACT_TEXT: "${artefact.text}",
+        PRIMARY_TEXT: "${artefact.text}",
         CONTEXT: "${scene.context}",
         VISUALISATION_GUIDE: "${scene.visualisation}"`;
 };
@@ -93,6 +97,7 @@ const downloadAndSaveImage = async (imageUrl: string) => {
       const fileName = `${Date.now()}.png`;
       const absolutePath = path.join(
         process.env.NEXT_PUBLIC_GENERATIONS_DIR,
+        "/images",
         fileName
       );
 
@@ -109,13 +114,36 @@ const downloadAndSaveImage = async (imageUrl: string) => {
   }
 };
 
-export const mainSingle = async () => {
+const getNextGenerationFilePath = (directory: string): string => {
+  // Get list of existing generation files
+  const files = fs.readdirSync(directory);
+  const generationFiles = files.filter((file) =>
+    file.match(/^generations_\d+\.json$/)
+  );
+
+  // Find the next number to use
+  const nextNumber =
+    generationFiles.length > 0
+      ? Math.max(
+          ...generationFiles.map((file) =>
+            parseInt(file.match(/^generations_(\d+)\.json$/)?.[1] || "0")
+          )
+        ) + 1
+      : 1;
+
+  return path.join(directory, `generations_${nextNumber}.json`);
+};
+
+export const createGeneration = async (
+  scenes: Scene[],
+  prompt_index: number
+) => {
   try {
     if (!process.env.NEXT_PUBLIC_GENERATIONS_DIR || !process.env.PRISMA_DIR) {
       throw new Error("NEXT_PUBLIC_GENERATIONS_DIR or PRISMA_DIR is not set");
     }
     const scene = scenes[14];
-    const prompt = createPrompt(scene);
+    const prompt = createPrompt(scene, prompt_index);
     const generationRaw = await createGenerationForScene(prompt);
     const imageUrl = generationRaw.output[0]; // Extract image URL
 
@@ -124,47 +152,43 @@ export const mainSingle = async () => {
       throw new Error("No image found");
     }
     const generation: Generation = {
-      id: `generation_${generationRaw.id}`.toString(),
+      id: uuidv4(),
       prompt: prompt,
-      image_url: `process.env.NEXT_PUBLIC_GENERATIONS_DIR + "/${fileName}"`, // Changed to string concatenation
+      image_url: fileName,
       artefact: scene.artefact,
       scene: scene.id,
     };
 
-    const generationFilePath = path.join(
-      process.env.PRISMA_DIR,
-      `generations.ts`.toString()
+    const generationFilePath = getNextGenerationFilePath(
+      process.env.NEXT_PUBLIC_GENERATIONS_DIR
     );
 
-    // Modified to avoid JSON.stringify escaping
-    const generationFileContent = `
-    import dotenv from "dotenv";
-    dotenv.config();
-    import { Generation } from "../src/types/generation";
-    export const generations: Generation[] = [
-      {
-        id: "${generation.id}",
-        prompt: ${JSON.stringify(generation.prompt)},
-        image_url: ${generation.image_url},
-        artefact: "${generation.artefact}",
-        scene: "${generation.scene}"
-      }
-    ];`;
-
-    await writeFile(generationFilePath, generationFileContent, "utf8");
+    // Write as JSON file
+    await writeFile(
+      generationFilePath,
+      JSON.stringify([generation], null, 2),
+      "utf8"
+    );
   } catch (error) {
     console.error(error);
   }
 };
 
-export const mainMultiple = async () => {
+export const createGenerations = async (
+  scenes: Scene[],
+  prompt_index: number
+) => {
   try {
-    if (!process.env.NEXT_PUBLIC_GENERATIONS_DIR || !process.env.PRISMA_DIR) {
+    if (
+      !process.env.NEXT_PUBLIC_GENERATIONS_DIR ||
+      !process.env.NEXT_PUBLIC_GENERATIONS_DIR ||
+      !process.env.PRISMA_DIR
+    ) {
       throw new Error("NEXT_PUBLIC_GENERATIONS_DIR or PRISMA_DIR is not set");
     }
 
     const generationPromises = scenes.map(async (scene: Scene) => {
-      const prompt = createPrompt(scene);
+      const prompt = createPrompt(scene, prompt_index);
       const generationRaw = await createGenerationForScene(prompt);
       const imageUrl = generationRaw.output[0]; // Extract image URL
 
@@ -174,7 +198,7 @@ export const mainMultiple = async () => {
       }
 
       const generation: Generation = {
-        id: `generation_${scene.artefact}`.toString(),
+        id: uuidv4(),
         prompt: prompt,
         image_url: fileName,
         artefact: scene.artefact,
@@ -184,27 +208,18 @@ export const mainMultiple = async () => {
     });
 
     const generations = await Promise.all(generationPromises);
-
-    const generationFilePath = path.join(
-      process.env.PRISMA_DIR,
-      `generations.ts`.toString()
+    const generationFilePath = getNextGenerationFilePath(
+      process.env.NEXT_PUBLIC_GENERATIONS_DIR
     );
 
-    // Modified to avoid JSON.stringify escaping
-    const generationFileContent = `
-    import dotenv from "dotenv";
-    dotenv.config();
-    import { Generation } from "../src/types/generation";
-    export const generations: Generation[] = ${JSON.stringify(
-      generations,
-      null,
-      2
-    ).replace(/"image_url": "([^"]+)"/g, (_, p1) => `"image_url": ${p1}`)};`;
-
-    await writeFile(generationFilePath, generationFileContent, "utf8");
+    // Write as JSON file
+    await writeFile(
+      generationFilePath,
+      JSON.stringify(generations, null, 2),
+      "utf8"
+    );
+    return generations;
   } catch (error) {
     console.error(error);
   }
 };
-
-mainMultiple();

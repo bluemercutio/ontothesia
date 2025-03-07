@@ -1,13 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 import { artefacts } from "./artefacts";
 import { embeddings } from "./embeddings";
-import { scenes } from "./scenes";
-import { experiences } from "./experiences";
-import { generations } from "./generations";
+import fs from "node:fs";
 
+import path from "path";
+import { Experience } from "../src/types/experience";
+import { Scene } from "../src/types/scene";
+import { Generation } from "../src/types/generation";
 const prisma = new PrismaClient();
 
 async function main() {
+  if (!process.env.PRISMA_DIR) {
+    throw new Error("PRISMA_DIR is not set");
+  }
   console.log("Start seeding...");
 
   // Delete existing records in correct order (respecting foreign key constraints)
@@ -18,7 +23,7 @@ async function main() {
   for (const artefact of artefacts) {
     const embedding = embeddings.find((e) => e.artefactId === artefact.id);
     if (!embedding) {
-      console.log(
+      console.warn(
         `No embedding found for artefact ${artefact.id}, skipping...`
       );
       continue;
@@ -32,7 +37,7 @@ async function main() {
       !artefact.citation ||
       !artefact.text
     ) {
-      console.log(
+      console.warn(
         `Missing required fields for artefact ${artefact.id}, skipping...`
       );
       continue;
@@ -64,25 +69,40 @@ async function main() {
     console.log(`Created embedding with id: ${createdEmbedding.id}`);
   }
 
-  for (const scene of scenes) {
-    const createdScene = await prisma.scene.create({
-      data: {
-        id: scene.id,
-        title: scene.title,
-        context: scene.context,
-        artefactId: scene.artefact,
-        image_url:
-          "/api/proxy-image?url=https%3A%2F%2Fimg.freepik.com%2Ffree-psd%2Fcosmic-nebula-celestial-tapestry-stars-gas_632498-24057.jpg%3Fsemt%3Dais_hybrid",
-        video_url: scene.video_url || "",
-        visualisation: scene.visualisation,
-        experienceId: null,
-      },
-    });
+  const experienceFiles = fs.readdirSync(
+    path.join(process.env.PRISMA_DIR!, "/data/experiences")
+  );
 
-    console.log(`Created scene with id: ${createdScene.id}`);
+  let experiences: Experience[] = [];
+  for (const file of experienceFiles) {
+    const filePath = path.join(
+      process.env.PRISMA_DIR!,
+      "/data/experiences",
+      file
+    );
+    const stats = fs.statSync(filePath);
+    if (!stats.isFile()) continue;
+
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    try {
+      const fileExperiences = JSON.parse(fileContent);
+      if (Array.isArray(fileExperiences)) {
+        experiences = experiences.concat(fileExperiences);
+      } else {
+        experiences.push(fileExperiences);
+      }
+    } catch (error) {
+      console.error(`Error parsing experience file ${file}:`, error);
+      continue;
+    }
   }
 
   for (const experience of experiences) {
+    if (!experience.title || !experience.description) {
+      console.warn(`Missing required fields for experience, skipping...`);
+      continue;
+    }
+
     const createdExperience = await prisma.experience.create({
       data: {
         id: experience.id,
@@ -106,20 +126,152 @@ async function main() {
 
     console.log(`Created experience with id: ${createdExperience.id}`);
     console.log(`Updated scenes for experience: ${createdExperience.id}`);
+  }
 
-    for (const generation of generations) {
-      const createdGeneration = await prisma.generation.create({
-        data: {
-          id: "generation_" + generation.artefact,
-          prompt: generation.prompt,
-          image_url: generation.image_url,
-          artefactId: generation.artefact,
-          sceneId: generation.scene,
-        },
-      });
+  const sceneFiles = fs.readdirSync(
+    path.join(process.env.PRISMA_DIR!, "/data/scenes")
+  );
 
-      console.log(`Created generation with id: ${createdGeneration.id}`);
+  let scenes: Scene[] = [];
+  for (const file of sceneFiles) {
+    const filePath = path.join(process.env.PRISMA_DIR!, "/data/scenes", file);
+    const stats = fs.statSync(filePath);
+    if (!stats.isFile()) continue;
+
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    try {
+      const fileScenes = JSON.parse(fileContent);
+      // Handle both array and single object cases
+      if (Array.isArray(fileScenes)) {
+        scenes = scenes.concat(fileScenes);
+      } else {
+        scenes.push(fileScenes);
+      }
+    } catch (error) {
+      console.error(`Error parsing scene file ${file}:`, error);
+      continue;
     }
+  }
+
+  for (const scene of scenes) {
+    // Add validation check
+
+    if (
+      !scene.title ||
+      !scene.context ||
+      !scene.artefact ||
+      !scene.visualisation
+    ) {
+      if (!scene.title) {
+        console.warn(`Scene ${scene.id} is missing the title.`);
+      }
+      if (!scene.context) {
+        console.warn(`Scene ${scene.id} is missing the context.`);
+      }
+      if (!scene.artefact) {
+        console.warn(`Scene ${scene.id} is missing the artefact.`);
+      }
+      if (!scene.visualisation) {
+        console.warn(`Scene ${scene.id} is missing the visualisation.`);
+      }
+
+      console.warn(`Missing required fields for scene, skipping...`);
+      continue;
+    }
+
+    const experience = experiences.find((e) => {
+      return e.scenes.includes(scene.id);
+    });
+
+    if (!experience) {
+      console.warn(`No experience found for scene ${scene.id}, skipping...`);
+      continue;
+    }
+
+    const fetchedExperience = await prisma.experience.findUnique({
+      where: {
+        id: experience.id,
+      },
+    });
+
+    const createdScene = await prisma.scene.create({
+      data: {
+        id: scene.id,
+        title: scene.title,
+        context: scene.context,
+        artefact: {
+          connect: {
+            id: scene.artefact,
+          },
+        },
+        image_url:
+          "/api/proxy-image?url=https%3A%2F%2Fimg.freepik.com%2Ffree-psd%2Fcosmic-nebula-celestial-tapestry-stars-gas_632498-24057.jpg%3Fsemt%3Dais_hybrid",
+        video_url: scene.video_url || "",
+        visualisation: scene.visualisation,
+        experience: {
+          connect: {
+            id: fetchedExperience?.id,
+          },
+        },
+      },
+    });
+
+    console.log(`Created scene with id: ${createdScene.id}`);
+  }
+
+  const generationFiles = fs.readdirSync(
+    path.join(process.env.PRISMA_DIR!, "/data/generations")
+  );
+
+  let generations: Generation[] = [];
+  for (const file of generationFiles) {
+    const filePath = path.join(
+      process.env.PRISMA_DIR!,
+      "/data/generations",
+      file
+    );
+    const stats = fs.statSync(filePath);
+    if (!stats.isFile()) continue;
+
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    try {
+      const fileGenerations = JSON.parse(fileContent);
+      if (Array.isArray(fileGenerations)) {
+        generations = generations.concat(fileGenerations);
+      } else {
+        generations.push(fileGenerations);
+      }
+    } catch (error) {
+      console.error(`Error parsing generation file ${file}:`, error);
+      continue;
+    }
+  }
+
+  for (const generation of generations) {
+    if (!generation.id || !generation.prompt || !generation.image_url) {
+      console.warn(`Missing required fields for generation, skipping...`);
+      continue;
+    }
+
+    const createdGeneration = await prisma.generation.create({
+      data: {
+        id: generation.id,
+        prompt: generation.prompt,
+        image_url: generation.image_url,
+        artefact: {
+          connect: {
+            id: generation.artefact,
+          },
+        },
+        scene: {
+          connect: {
+            id: generation.scene,
+          },
+        },
+      },
+    });
+
+    console.log(`Created generation with id: ${createdGeneration.id}`);
   }
 
   console.log("Seeding finished.");

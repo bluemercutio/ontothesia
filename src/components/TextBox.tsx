@@ -7,7 +7,7 @@ interface TextBoxProps {
 
 const TextBox: React.FC<TextBoxProps> = ({ title, content }) => {
   return (
-    <div className="bg-[var(--primary-bg)] rounded-lg shadow-md px-12 py-6 mb-6 w-1/2 ">
+    <div className="bg-black  shadow-md px-12 py-10 mb-6  ">
       {title && (
         <h2 className="text-2xl font-semibold mb-4 text-white">{title}</h2>
       )}

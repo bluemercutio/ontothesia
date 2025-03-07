@@ -40,7 +40,7 @@ export function IntroTitleAdvanced() {
                 opacity: { duration: 0.3, delay: index * 0.1 },
                 x: { duration: 0.3, delay: index * 0.1 },
               }}
-              className="text-4xl font-bold font-[family-name:var(--font-kanit)] text-white"
+              className="text-4xl font-bold text-white"
             >
               {letter}
             </motion.span>
@@ -61,7 +61,7 @@ export function IntroTitleAdvanced() {
                   delay: 0.4 + index * 0.1,
                 },
               }}
-              className="text-4xl font-bold font-[family-name:var(--font-kanit)] text-gray-400"
+              className="text-4xl font-bold text-gray-400"
             >
               {letter}
             </motion.span>
@@ -84,7 +84,7 @@ export function IntroTitleAdvanced() {
                   delay: 0.4 + index * 0.1,
                 },
               }}
-              className="text-4xl font-bold font-[family-name:var(--font-kanit)] text-gray-400"
+              className="text-4xl font-bold text-gray-400"
             >
               {letter}
             </motion.span>
@@ -116,7 +116,7 @@ export function IntroTitleAdvanced() {
                 opacity: { duration: 0.3, delay: index * 0.1 },
                 x: { duration: 0.3, delay: index * 0.1 },
               }}
-              className="text-4xl font-bold font-[family-name:var(--font-kanit)] text-white"
+              className="text-4xl font-bold text-white"
             >
               {letter}
             </motion.span>

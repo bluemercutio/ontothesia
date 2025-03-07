@@ -1,13 +1,11 @@
 export const projectInfo = [
   {
     title: "Overview",
-    paragraph: `Ontothesia emerges from the confluence of *ontology* and *synesthesia*, invoking both the layered complexity of being and the sense-blurring interplay that arises when multiple forms of knowledge converge.
-  
-  At its core, the project grapples with how cultural, philosophical, and creative texts interrelate when freed from static categorisations. Drawing on Gilbert Simondon’s concept of transduction—the idea that new forms arise from the interactive potential of preexisting elements—it posits that cultural artefacts, once placed in meaningful conversation, can give rise to entirely novel forms of expression. Rather than isolating these artefacts in rigid, siloed structures, *Ontothesia* treats them as dynamic nodes of information that collectively shape each other’s significance.
-  
-  Grounded in African cultural contexts, Ontothesia also draws on Bayo Akomolafe’s call to reimagine the relationships between people, technologies, and worlds beyond conventional humanist frameworks. The project situates African epistemologies as powerful sites of knowledge-making, where oral traditions, migratory histories, and indigenous philosophies intersect. By mapping textual, visual, and performative elements into a semantic web, Ontothesia seeks to create an environment in which these various modes of being and knowing can resonate and reshape one another. In doing so, it not only archives and reanimates African cultural expressions, but also nurtures fresh ontological possibilities that challenge the impositions of colonial borders and rigid definitions of identity.
-  
-  At a practical level, Ontothesia unfolds as a space where audiences can traverse the cultural matrix through an immersive exhibition. Participants begin with a single artefact—a poem, a philosophical treatise, a fragment of oral history—and are guided through the semantic connections that bind it to other works across the continent. Yet the project aspires to move beyond mapping alone. In line with Simondon’s transductive logic, each artefact becomes a catalyst for generative expressions, visually morphing into haunting, dreamlike representations that merge elements from diverse sources. In this sense, Ontothesia isn’t merely about charting cultural knowledge but catalyzing new ways of envisioning the shared, yet profoundly diverse, African experience.`,
+    paragraph: `*Ontothesia* is a project that aims to create novel ways of experiencing, interacting with, and traversing knowledge. The project is one of archiving, mapping and imagining. The core objective of *Ontothesia* is to develop sensational mechanisms through which one can explore cultural hyper-objects in an immersive way. 
+
+*Ontothesia* explores a different conception of AI, not as artificial intelligence, but rather *Alternative Intelligence. By* leveraging language models as *interfaces* to different kinds of knowledge, the project gives viewers/participants a means to experience the contours of some ontological enquiry in a way that is fluid and ephemeral, yet rooted in the provenance and qualities of the source material that informs the enquiry. 
+
+On the surface *Ontothesia* can be regarded as an experiment in *Infinite Cinema* / *Infinite Gallery.* More profoundly it is an exploration of Posthuman Consciousness, cultural cartography, and the inherently pluralistic nature of The Universe.`,
   },
   {
     title: "To Archive is to Imagine and to Imagine is to Create",

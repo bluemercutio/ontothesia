@@ -1,0 +1,20 @@
+[
+  {
+    "prompt": "Create an image of a scene that depicts in some way the ARTEFACT_TEXT. The CONTEXT should inform the depiction of the scene and the VISUALISATION GUIDE will inform how to depict the ARTEFACT_TEXT:General Instructions:The image should fade into a black background in a smokey way. No part of the representation should touch the borders.You can be abstract but should only do so if the text gestures towards abstractionYour goal is focus on a centeral subject with a clear forground and a background that disappears into black #000000Do not create any text in the image."
+  },
+  {
+    "prompt": "Create simple, slightly abstract representations. Do not use too many colours. THe background should fade towards black and be non-descript. The foreground should be a single subject with a clear focus."
+  },
+  {
+    "prompt": "Create representations that are abstract and non-representational. The background should fade towards black and be non-descript. The foreground should be a single subject with a clear focus."
+  },
+  {
+    "prompt": "Create abstract representations using black, gray and red."
+  },
+  {
+    "prompt": "Create abstract objects derived from the below text. Do it in the style of cave art"
+  },
+  {
+    "prompt": "Create extremely abstract representations using black, gray and red."
+  }
+]

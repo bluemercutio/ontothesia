@@ -7,6 +7,7 @@
     "db-seed": "tsx prisma/seed.ts",
     "create-embeddings": "NODE_NO_WARNINGS=1 tsx --tsconfig tsconfig.json scripts/embeddings.ts",
     "create-generation": "NODE_NO_WARNINGS=1 tsx --tsconfig tsconfig.json scripts/generation.ts",
+    "create-scenes": "NODE_NO_WARNINGS=1 tsx --tsconfig tsconfig.json scripts/general.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -30,7 +31,8 @@
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "styled-components": "^6.1.15",
-    "three": "^0.174.0"
+    "three": "^0.174.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

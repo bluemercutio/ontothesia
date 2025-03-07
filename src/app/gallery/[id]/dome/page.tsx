@@ -1,19 +1,39 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
-import { useGetExperiencesQuery, useGetGenerationsQuery } from "@/store/api";
+import { useGetExperienceByIdQuery, useGetGenerationsQuery } from "@/store/api";
 import { useParams } from "next/navigation";
 import DomeScene from "@/components/Dome";
 import { useGetScenesQuery } from "@/store/api";
 import path from "path";
 import { Generation } from "@/types/generation";
+import { Scene } from "@/types/scene";
+import { ExperienceId } from "@/types/experience";
+
 export default function ExperiencePage() {
-  const params = useParams();
-  const { data: experiences, isLoading, error } = useGetExperiencesQuery();
+  const { id } = useParams() as { id: ExperienceId };
+  const {
+    data: experience,
+    isLoading: isLoadingExperience,
+    error: errorExperience,
+  } = useGetExperienceByIdQuery(id);
   const allScenes = useGetScenesQuery();
   const allGenerations = useGetGenerationsQuery();
+  const [experienceScenes, setExperienceScenes] = useState<Scene[]>([]);
+
+  useEffect(() => {
+    if (experience?.scenes && allScenes.data) {
+      // First, get all scenes for this experience
+      const filteredScenes = allScenes.data.filter((scene) =>
+        experience.scenes.some((expSceneId) => expSceneId === scene.id)
+      );
+
+      setExperienceScenes(filteredScenes);
+      console.log("Filtered scenes:", filteredScenes);
+    }
+  }, [experience?.scenes, allScenes.data]);
 
   if (!allGenerations.data || allGenerations.isLoading) {
     return (
@@ -29,6 +49,7 @@ export default function ExperiencePage() {
       </div>
     );
   }
+
   let processedGenerations: Generation[] = [];
   if (!process.env.NEXT_PUBLIC_GENERATIONS_DIR) {
     throw new Error("NEXT_PUBLIC_GENERATIONS_DIR is not set");
@@ -49,26 +70,15 @@ export default function ExperiencePage() {
     return <div>No scenes or experiences found</div>;
   }
 
-  if (!experiences) {
-    return <div>No experiences found</div>;
+  if (!experience && !isLoadingExperience && !errorExperience) {
+    return <div>No experience found</div>;
   }
 
-  const scenes = allScenes.data?.filter((scene) => {
-    return experiences.some((experience) =>
-      experience.scenes.includes(scene.id)
-    );
-  });
-
-  if (!experiences && !isLoading && !error) {
-    return <div>No experiences found</div>;
-  }
-
-  if (!params) {
+  if (!id) {
     return <div>No params found</div>;
   }
 
-  const experience = experiences?.find((exp) => exp.id === params?.id);
-  if (isLoading) {
+  if (isLoadingExperience) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header title="Loading..." />
@@ -85,7 +95,7 @@ export default function ExperiencePage() {
     );
   }
 
-  if (error || !experience) {
+  if (errorExperience || !experience) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header title="Experience Not Found" />
@@ -106,10 +116,12 @@ export default function ExperiencePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header title={experience.title} />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex flex-col items-center gap-8">
-          <DomeScene scenes={scenes} generations={processedGenerations} />
+          <DomeScene
+            scenes={experienceScenes}
+            generations={processedGenerations}
+          />
         </div>
       </main>
     </div>

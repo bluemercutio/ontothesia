@@ -62,17 +62,6 @@ const MapButton: React.FC<MapButtonProps> = ({
   artefact,
 }) => {
   const [showNetwork, setShowNetwork] = useState<boolean>(false);
-  // const memoizedData = useMemo(() => data, [data]);
-
-  // useEffect(() => {
-  //   if (showNetwork) {
-  //     console.log("Network visible", {
-  //       hasData: !!memoizedData,
-  //       dataNodes: memoizedData?.nodes?.length,
-  //       dataEdges: memoizedData?.edges?.length,
-  //     });
-  //   }
-  // }, [showNetwork]);
 
   return (
     <>
@@ -86,19 +75,19 @@ const MapButton: React.FC<MapButtonProps> = ({
         $isVisible={showNetwork}
         $border={true}
         $rounded={true}
-        onClick={(e) => e.stopPropagation()} // Stop clicks from propagating to gallery
+        onClick={(e) => e.stopPropagation()}
       >
         {showNetwork && data && (
           <div
             style={{ width: "100%", height: "100%", position: "relative" }}
-            onClick={(e) => e.stopPropagation()} // Contain clicks within the map
+            onClick={(e) => e.stopPropagation()}
           >
             <Network
               data={data}
               width={376}
               height={276}
               currentNodeId={currentNodeId}
-              setSelectedNode={setSelectedNode}
+              handleSelectedNode={setSelectedNode}
               artefact={artefact}
             />
           </div>

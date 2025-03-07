@@ -6,7 +6,7 @@ export function IntroTitle() {
   const text = "ONTOTHESIA";
 
   return (
-    <h1 className="text-4xl font-bold font-[family-name:var(--font-kanit)]">
+    <h1 className="text-4xl font-bold">
       {text.split("").map((char, index) => (
         <motion.span
           key={index}

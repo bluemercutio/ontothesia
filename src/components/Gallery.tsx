@@ -85,7 +85,7 @@ const Gallery: React.FC<GalleryProps> = ({
         onNodeChange(clickedNode);
       }
     },
-    [mouse, raycaster, embeddings, onNodeChange, fullNetwork]
+    [mouse, raycaster, embeddings, onNodeChange, fullNetwork, currentNodeId]
   );
 
   useEffect(() => {

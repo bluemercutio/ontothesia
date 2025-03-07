@@ -6,7 +6,7 @@ const Artefact: React.FC<ArtefactType> = ({ text, region, approx_date }) => {
     <div
       className={`
         w-72
-        h-auto
+        h-72
         bg-[var(--primary-bg)]
         rounded-xl 
         shadow-lg 

@@ -17,49 +17,45 @@ model Experience {
 }
 
 model Scene {
-  id            String      @id @default(uuid())
+  id            String      @id
   title         String
   context       String
+  artefactId    String
   image_url     String
-  video_url     String
-  // One-to-one relationship with Artefact
-  artefact      Artefact    @relation(fields: [artefactId], references: [id])
-  artefactId    String      @unique
-  // One-to-many relationship back to Experience
-  experience    Experience? @relation(fields: [experienceId], references: [id])
-  experienceId  String?
+  video_url     String?
   visualisation String
-  generations   Generation[]
+  experienceId  String?
+  artefact      Artefact    @relation("SceneToArtefact", fields: [artefactId], references: [id])
+  experience    Experience? @relation(fields: [experienceId], references: [id])
+  generation    Generation? @relation("SceneToGeneration")
 }
 
 model Artefact {
-  id          String     @id
+  id          String       @id
   title       String
   text        String
   region      String
   approx_date String
   citation    String
-  scene       Scene?
+  scenes      Scene[]      @relation("SceneToArtefact")
+  generations Generation[] @relation("GenerationToArtefact")
   embedding   Embedding?
-  generations Generation[]
 }
 
 model Embedding {
   id         String   @id
   text       String
   vector     Float[]
-  artefact   Artefact @relation(fields: [artefactId], references: [id])
   artefactId String   @unique
+  artefact   Artefact @relation(fields: [artefactId], references: [id])
 }
 
 model Generation {
-  id        String   @id @default(uuid())
-  prompt    String
-  image_url String
-  artefact  Artefact @relation(fields: [artefactId], references: [id])
+  id         String   @id
+  prompt     String
+  image_url  String
   artefactId String
-  scene     Scene    @relation(fields: [sceneId], references: [id])
-  sceneId   String
+  sceneId    String   @unique
+  artefact   Artefact @relation("GenerationToArtefact", fields: [artefactId], references: [id])
+  scene      Scene    @relation("SceneToGeneration", fields: [sceneId], references: [id])
 }
-
-

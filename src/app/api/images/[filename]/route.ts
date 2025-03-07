@@ -14,6 +14,7 @@ export async function GET(
     const { filename } = await context.params;
     const filePath = path.join(
       process.env.NEXT_PUBLIC_GENERATIONS_DIR,
+      "images",
       filename
     );
 

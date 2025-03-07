@@ -82,10 +82,10 @@ const Navbar: React.FC<NavbarProps> = memo(
       }
     }, [networkData]);
 
-    // Check if current path matches the pattern /gallery/{id}/gallery or /gallery/{id}/dome
+    // Check if current path matches the pattern /gallery/{id}/network or /gallery/{id}/dome
     const shouldAutoHide = React.useMemo(() => {
       return pathname
-        ? /^\/gallery\/[^/]+\/(gallery|dome)$/.test(pathname)
+        ? /^\/gallery\/[^/]+\/(network|dome)$/.test(pathname)
         : false;
     }, [pathname]);
 

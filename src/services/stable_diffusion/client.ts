@@ -1,7 +1,4 @@
-import {
-  StableDiffusionRequest,
-  StableDiffusionResponse,
-} from "@/types/generation";
+import { StableDiffusionResponse } from "@/types/generation";
 import { TEXT2IMG_URL } from "./constants";
 
 export const createStableDiffusionGeneration = async (
@@ -10,6 +7,8 @@ export const createStableDiffusionGeneration = async (
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+
+    console.log("Prompt: ", prompt);
 
     const raw = JSON.stringify({
       key: process.env.STABLE_DIFFUSION_API_KEY,
@@ -21,7 +20,6 @@ export const createStableDiffusionGeneration = async (
       num_inference_steps: "20",
       seed: null,
       guidance_scale: 7.5,
-      safety_checker: "yes",
       multi_lingual: "no",
       panorama: "no",
       self_attention: "no",
@@ -29,7 +27,10 @@ export const createStableDiffusionGeneration = async (
       embeddings_model: null,
       webhook: null,
       track_id: null,
-    } as StableDiffusionRequest);
+      safety_checker: false,
+    });
+
+    console.log("Raw Request Stable Diffusion: ", raw);
 
     const requestOptions = {
       method: "POST",

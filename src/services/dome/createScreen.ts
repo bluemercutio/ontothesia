@@ -3,7 +3,7 @@ import { Scene } from "@/types/scene";
 import { Generation } from "@/types/generation";
 import { vertexShader, fragmentShader } from "./shaders";
 import {
-  getGenerationForScene,
+  findGenerationForScene,
   getImageUrlForGeneration,
 } from "../utils/generations";
 
@@ -24,7 +24,7 @@ export const createScreen = (
   let texture: THREE.Texture = new THREE.Texture(); // fallback texture
 
   if (scene) {
-    const generation = getGenerationForScene(scene, generations);
+    const generation = findGenerationForScene(scene, generations);
     if (generation) {
       texture = new THREE.TextureLoader().load(
         getImageUrlForGeneration(generation),

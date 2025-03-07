@@ -1,19 +1,48 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Network } from "@/components/Network";
 import {
   useGetArtefactByIdQuery,
+  useGetArtefactsQuery,
   useGetEmbeddingsQuery,
   useGetScenesQuery,
 } from "@/store/api";
 import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
 import Link from "next/link";
-
+import { GraphNode } from "@/services/graph/interface";
+import { Artefact } from "@/types/artefact";
 export default function ArtefactPage() {
   const params = useParams();
   const id = params?.id;
+
+  const { data: artefacts, isLoading: artefactsLoading } =
+    useGetArtefactsQuery();
+  const [selectedArtefact, setSelectedArtefact] = useState<Artefact | null>(
+    null
+  );
+
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
+  useEffect(() => {
+    if (!id) {
+      throw new Error("No id");
+    }
+    setSelectedNode({
+      id: `${id}-embedding`,
+      label: `${id}-embedding`,
+      artefact: id as string,
+    });
+    console.log("test", artefacts);
+    if (artefacts) {
+      console.log("ARTEFACTS", artefacts);
+      const artefact = artefacts.find((a) => a.id === id);
+      console.log("ARTEFACT", artefact);
+      if (artefact) {
+        setSelectedArtefact(artefact);
+      }
+    }
+  }, [artefacts, id]);
 
   console.log("PARAMS", params);
 
@@ -47,7 +76,8 @@ export default function ArtefactPage() {
     return network;
   }, [artefact, embeddings, id, scenes]);
 
-  const isLoading = artefactLoading || embeddingsLoading || scenesLoading;
+  const isLoading =
+    artefactLoading || embeddingsLoading || scenesLoading || artefactsLoading;
 
   if (isLoading) {
     return (
@@ -57,7 +87,7 @@ export default function ArtefactPage() {
     );
   }
 
-  if (artefactError || !artefact) {
+  if (artefactError || !artefact || !selectedArtefact) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-red-500">
@@ -69,6 +99,26 @@ export default function ArtefactPage() {
         >
           Return to Library
         </Link>
+      </div>
+    );
+  }
+
+  const handleSelectedNode = (node: GraphNode) => {
+    console.log("Handle selected node:", node);
+    setSelectedNode(node);
+    // Update the selected artefact when node changes
+    if (artefacts) {
+      const newArtefact = artefacts.find((a) => a.id === node.artefact);
+      if (newArtefact) {
+        setSelectedArtefact(newArtefact);
+      }
+    }
+  };
+
+  if (!selectedNode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
       </div>
     );
   }
@@ -127,9 +177,9 @@ export default function ArtefactPage() {
                   data={directedEmbeddingNetwork}
                   width={896}
                   height={600}
-                  currentNodeId={`${id}-embedding`}
-                  setSelectedNode={() => {}}
-                  artefact={artefact}
+                  currentNodeId={selectedNode.id}
+                  handleSelectedNode={handleSelectedNode}
+                  artefact={selectedArtefact}
                 />
               </div>
             </div>

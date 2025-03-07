@@ -6,14 +6,12 @@ interface NetworkOverlayProps {
   selectedNode: GraphNode | null;
   artefact: Artefact | null;
   isLoading?: boolean;
-  onNodeSelect: (nodeId: string) => void;
 }
 
 export const NetworkOverlay: React.FC<NetworkOverlayProps> = ({
   selectedNode,
   artefact,
   isLoading = false,
-  onNodeSelect,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -107,13 +105,13 @@ export const NetworkOverlay: React.FC<NetworkOverlayProps> = ({
             <p>Citation: {artefact.citation}</p>
           </div>
 
-          <button
+          {/* <button
             onClick={() => onNodeSelect(selectedNode.id)}
             className="mt-3 text-xs hover:underline"
             style={{ color: "#3b82f6" }}
           >
             Clear selection
-          </button>
+          </button> */}
         </div>
       )}
     </div>

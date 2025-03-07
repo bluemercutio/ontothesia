@@ -12,6 +12,10 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        sans: ["var(--font-kanit)", "Arial", "sans-serif"],
+        bold: ["var(--font-kanit-bold)", "Arial", "sans-serif"],
+      },
     },
   },
   plugins: [],
