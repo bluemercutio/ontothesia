@@ -20,11 +20,11 @@ const getNextSceneFileName = (directory: string): string => {
 };
 
 const createSceneFile = async (scenes: Scene[]) => {
-  if (!process.env.PRISMA_DIR) {
-    throw new Error("PRISMA_DIR is not set");
+  if (!process.env.NEXT_PUBLIC_PRISMA_DIR) {
+    throw new Error("NEXT_PUBLIC_PRISMA_DIR is not set");
   }
   const outputFilePath = getNextSceneFileName(
-    path.join(process.env.PRISMA_DIR, "/data/scenes")
+    path.join(process.env.NEXT_PUBLIC_PRISMA_DIR, "/data/scenes")
   );
   const fileContent = JSON.stringify(scenes, null, 2);
   fs.writeFileSync(outputFilePath, fileContent, "utf-8");
@@ -32,11 +32,11 @@ const createSceneFile = async (scenes: Scene[]) => {
 };
 
 const createExperienceFile = async (experience: Experience) => {
-  if (!process.env.PRISMA_DIR) {
-    throw new Error("PRISMA_DIR is not set");
+  if (!process.env.NEXT_PUBLIC_PRISMA_DIR) {
+    throw new Error("NEXT_PUBLIC_PRISMA_DIR is not set");
   }
   const outputFilePath = getNextExperienceFileName(
-    path.join(process.env.PRISMA_DIR, "/data/experiences")
+    path.join(process.env.NEXT_PUBLIC_PRISMA_DIR, "/data/experiences")
   );
   const fileContent = JSON.stringify(experience, null, 2);
   fs.writeFileSync(outputFilePath, fileContent, "utf-8");
@@ -57,12 +57,12 @@ const createScene = async (
   prompt_index: number
 ): Promise<Scene> => {
   try {
-    if (!process.env.PRISMA_DIR) {
-      throw new Error("PRISMA_DIR is not set");
+    if (!process.env.NEXT_PUBLIC_PRISMA_DIR) {
+      throw new Error("NEXT_PUBLIC_PRISMA_DIR is not set");
     }
     const prompts = JSON.parse(
       fs.readFileSync(
-        path.join(process.env.PRISMA_DIR, "../prisma/prompts.json"),
+        path.join(process.env.NEXT_PUBLIC_PRISMA_DIR, "../prisma/prompts.json"),
         "utf-8"
       )
     );
@@ -104,8 +104,8 @@ const createScene = async (
 
 const createScenes = async (artefacts: Artefact[], prompt_index: number) => {
   try {
-    if (!process.env.PRISMA_DIR) {
-      throw new Error("PRISMA_DIR is not set");
+    if (!process.env.NEXT_PUBLIC_PRISMA_DIR) {
+      throw new Error("NEXT_PUBLIC_PRISMA_DIR is not set");
     }
     const scenes: Scene[] = [];
 
@@ -170,8 +170,8 @@ const createExperienceWithScenes = (
 
 const main = async () => {
   const PROMPT_INDEX: number = 6;
-  if (!process.env.PRISMA_DIR) {
-    throw new Error("PRISMA_DIR is not set");
+  if (!process.env.NEXT_PUBLIC_PRISMA_DIR) {
+    throw new Error("NEXT_PUBLIC_PRISMA_DIR is not set");
   }
   console.log("Creating experience");
   const experience = await createExperience();

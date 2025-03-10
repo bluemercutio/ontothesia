@@ -10,8 +10,8 @@ import { Generation } from "../src/types/generation";
 const prisma = new PrismaClient();
 
 async function main() {
-  if (!process.env.PRISMA_DIR) {
-    throw new Error("PRISMA_DIR is not set");
+  if (!process.env.NEXT_PUBLIC_PRISMA_DIR) {
+    throw new Error("NEXT_PUBLIC_PRISMA_DIR is not set");
   }
   console.log("Start seeding...");
 
@@ -70,13 +70,13 @@ async function main() {
   }
 
   const experienceFiles = fs.readdirSync(
-    path.join(process.env.PRISMA_DIR!, "/data/experiences")
+    path.join(process.env.NEXT_PUBLIC_PRISMA_DIR!, "/data/experiences")
   );
 
   let experiences: Experience[] = [];
   for (const file of experienceFiles) {
     const filePath = path.join(
-      process.env.PRISMA_DIR!,
+      process.env.NEXT_PUBLIC_PRISMA_DIR!,
       "/data/experiences",
       file
     );
@@ -130,12 +130,16 @@ async function main() {
   }
 
   const sceneFiles = fs.readdirSync(
-    path.join(process.env.PRISMA_DIR!, "/data/scenes")
+    path.join(process.env.NEXT_PUBLIC_PRISMA_DIR!, "/data/scenes")
   );
 
   let scenes: Scene[] = [];
   for (const file of sceneFiles) {
-    const filePath = path.join(process.env.PRISMA_DIR!, "/data/scenes", file);
+    const filePath = path.join(
+      process.env.NEXT_PUBLIC_PRISMA_DIR!,
+      "/data/scenes",
+      file
+    );
     const stats = fs.statSync(filePath);
     if (!stats.isFile()) continue;
 
@@ -221,13 +225,13 @@ async function main() {
   }
 
   const generationFiles = fs.readdirSync(
-    path.join(process.env.PRISMA_DIR!, "/data/generations")
+    path.join(process.env.NEXT_PUBLIC_PRISMA_DIR!, "/data/generations")
   );
 
   let generations: Generation[] = [];
   for (const file of generationFiles) {
     const filePath = path.join(
-      process.env.PRISMA_DIR!,
+      process.env.NEXT_PUBLIC_PRISMA_DIR!,
       "/data/generations",
       file
     );

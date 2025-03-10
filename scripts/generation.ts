@@ -44,7 +44,7 @@ export const createGenerationsForScenes = async (
 };
 
 const createPrompt = (scene: Scene, prompt_index: number) => {
-  if (!process.env.PRISMA_DIR) {
+  if (!process.env.NEXT_PUBLIC_PRISMA_DIR) {
     throw Error("No prisma dir env found");
   }
   const artefact = artefacts.find(
@@ -56,7 +56,7 @@ const createPrompt = (scene: Scene, prompt_index: number) => {
 
   const prompts = JSON.parse(
     fs.readFileSync(
-      path.join(process.env.PRISMA_DIR, "../prisma/prompts.json"),
+      path.join(process.env.NEXT_PUBLIC_PRISMA_DIR, "../prisma/prompts.json"),
       "utf-8"
     )
   );
@@ -139,8 +139,13 @@ export const createGeneration = async (
   prompt_index: number
 ) => {
   try {
-    if (!process.env.NEXT_PUBLIC_GENERATIONS_DIR || !process.env.PRISMA_DIR) {
-      throw new Error("NEXT_PUBLIC_GENERATIONS_DIR or PRISMA_DIR is not set");
+    if (
+      !process.env.NEXT_PUBLIC_GENERATIONS_DIR ||
+      !process.env.NEXT_PUBLIC_PRISMA_DIR
+    ) {
+      throw new Error(
+        "NEXT_PUBLIC_GENERATIONS_DIR or NEXT_PUBLIC_PRISMA_DIR is not set"
+      );
     }
     const scene = scenes[14];
     const prompt = createPrompt(scene, prompt_index);
@@ -182,9 +187,11 @@ export const createGenerations = async (
     if (
       !process.env.NEXT_PUBLIC_GENERATIONS_DIR ||
       !process.env.NEXT_PUBLIC_GENERATIONS_DIR ||
-      !process.env.PRISMA_DIR
+      !process.env.NEXT_PUBLIC_PRISMA_DIR
     ) {
-      throw new Error("NEXT_PUBLIC_GENERATIONS_DIR or PRISMA_DIR is not set");
+      throw new Error(
+        "NEXT_PUBLIC_GENERATIONS_DIR or NEXT_PUBLIC_PRISMA_DIR is not set"
+      );
     }
 
     const generationPromises = scenes.map(async (scene: Scene) => {
