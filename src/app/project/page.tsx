@@ -8,7 +8,7 @@ import { projectInfo } from "./copyWrite";
 export default function Project() {
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 container mx-auto flex flex-col items-center bg-[var(--background)] border-2 border-white-500 w-1/2">
+      <main className="flex-1 container mx-auto flex flex-col items-center bg-[var(--background)] border border-white-500 w-1/2">
         <section className="w-full text-center">
           <h1 className="text-4xl bg-black text-white mx-auto flex items-center justify-center h-32">
             ONTOTHESIA

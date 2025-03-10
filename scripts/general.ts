@@ -147,6 +147,7 @@ export const createExperience = async () => {
 
   const experience: Experience = {
     id: uuidv4(),
+    visible: true,
     title: title,
     description: description,
     image_url: "",

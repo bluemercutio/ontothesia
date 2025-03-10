@@ -4,6 +4,7 @@ export type ExperienceId = string;
 
 export interface Experience {
   id: ExperienceId;
+  visible: boolean;
   title: string;
   description: string;
   scenes: SceneId[];

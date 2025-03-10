@@ -203,11 +203,12 @@ export const dbService: DBService = {
   // EXPERIENCE
   // ───────────────────────────────────────────────────────────────────
   createExperience: async (
-    data: Omit<Experience, "id">
+    data: Omit<Experience, "id" | "scenes">
   ): Promise<Experience> => {
     const created = await prisma.experience.create({
       data: {
         title: data.title,
+        visible: data.visible,
         description: data.description,
         image_url: data.image_url,
       },
@@ -216,7 +217,11 @@ export const dbService: DBService = {
       },
     });
     return {
-      ...created,
+      id: created.id,
+      title: created.title,
+      description: created.description,
+      visible: created.visible as boolean,
+      image_url: created.image_url,
       scenes: created.scenes.map((scene) => scene.id),
     };
   },
@@ -229,7 +234,11 @@ export const dbService: DBService = {
     });
     if (!experience) return null;
     return {
-      ...experience,
+      id: experience.id,
+      title: experience.title,
+      description: experience.description,
+      visible: experience.visible as boolean,
+      image_url: experience.image_url,
       scenes: experience.scenes.map((scene) => scene.id),
     };
   },
@@ -239,28 +248,41 @@ export const dbService: DBService = {
         scenes: true,
       },
     });
-    return experiences.map((exp) => ({
-      ...exp,
-      scenes: exp.scenes.map((scene) => scene.id),
-    }));
+    return experiences.map((exp) => {
+      return {
+        id: exp.id,
+        title: exp.title,
+        description: exp.description,
+        visible: exp.visible,
+        image_url: exp.image_url,
+        scenes: exp.scenes.map((scene) => scene.id),
+      };
+    });
   },
   updateExperience: async (
     id: ExperienceId,
-    data: Partial<Experience>
+    data: Partial<Omit<Experience, "id" | "scenes">>
   ): Promise<Experience> => {
     const updated = await prisma.experience.update({
       where: { id },
       data: {
-        title: data.title,
-        description: data.description,
-        image_url: data.image_url,
+        ...(data.title !== undefined && { title: data.title }),
+        ...(data.visible !== undefined && { visible: data.visible }),
+        ...(data.description !== undefined && {
+          description: data.description,
+        }),
+        ...(data.image_url !== undefined && { image_url: data.image_url }),
       },
       include: {
         scenes: true,
       },
     });
     return {
-      ...updated,
+      id: updated.id,
+      title: updated.title,
+      description: updated.description,
+      visible: updated.visible as boolean,
+      image_url: updated.image_url,
       scenes: updated.scenes.map((scene) => scene.id),
     };
   },
@@ -272,7 +294,11 @@ export const dbService: DBService = {
       },
     });
     return {
-      ...deleted,
+      id: deleted.id,
+      title: deleted.title,
+      description: deleted.description,
+      visible: deleted.visible as boolean,
+      image_url: deleted.image_url,
       scenes: deleted.scenes.map((scene) => scene.id),
     };
   },

@@ -106,6 +106,7 @@ async function main() {
     const createdExperience = await prisma.experience.create({
       data: {
         id: experience.id,
+        visible: experience.visible,
         title: experience.title,
         description: experience.description,
         image_url: experience.image_url || "/images/default_experience.png",
