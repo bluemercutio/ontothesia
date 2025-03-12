@@ -4,9 +4,9 @@ import { embeddings } from "./embeddings";
 import fs from "node:fs";
 
 import path from "path";
-import { Experience } from "../src/types/experience";
-import { Scene } from "../src/types/scene";
-import { Generation } from "../src/types/generation";
+import { Experience } from "@ontothesia/types/experience";
+import { Scene } from "@ontothesia/types/scene";
+import { Generation } from "@ontothesia/types/generation";
 const prisma = new PrismaClient();
 import * as dotenv from "dotenv";
 
@@ -23,11 +23,40 @@ async function main() {
   console.log("Start seeding...");
 
   // Delete existing records in correct order (respecting foreign key constraints)
-  await prisma.generation.deleteMany();
-  await prisma.scene.deleteMany();
-  await prisma.experience.deleteMany();
-  await prisma.embedding.deleteMany();
-  await prisma.artefact.deleteMany();
+  try {
+    await prisma.generation.deleteMany();
+    console.log("Deleted all generations");
+  } catch {
+    console.log("Generation table might not exist yet, continuing...");
+  }
+
+  try {
+    await prisma.scene.deleteMany();
+    console.log("Deleted all scenes");
+  } catch {
+    console.log("Scene table might not exist yet, continuing...");
+  }
+
+  try {
+    await prisma.experience.deleteMany();
+    console.log("Deleted all experiences");
+  } catch {
+    console.log("Experience table might not exist yet, continuing...");
+  }
+
+  try {
+    await prisma.embedding.deleteMany();
+    console.log("Deleted all embeddings");
+  } catch {
+    console.log("Embedding table might not exist yet, continuing...");
+  }
+
+  try {
+    await prisma.artefact.deleteMany();
+    console.log("Deleted all artefacts");
+  } catch {
+    console.log("Artefact table might not exist yet, continuing...");
+  }
 
   for (const artefact of artefacts) {
     const embedding = embeddings.find((e) => e.artefactId === artefact.id);

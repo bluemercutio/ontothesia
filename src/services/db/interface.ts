@@ -1,10 +1,10 @@
 // src/services/dbService.ts
 
-import { ArtefactId, Artefact } from "../../types/artefact";
-import { Scene, SceneId } from "../../types/scene";
-import { Experience, ExperienceId } from "../../types/experience";
-import { Embedding, EmbeddingId } from "../../types/embedding";
-import { Generation } from "../../types/generation";
+import { ArtefactId, Artefact } from "@ontothesia/types/artefact";
+import { Scene, SceneId } from "@ontothesia/types/scene";
+import { Experience, ExperienceId } from "@ontothesia/types/experience";
+import { Embedding, EmbeddingId } from "@ontothesia/types/embedding";
+import { Generation } from "@ontothesia/types/generation";
 
 // Because Prisma autogenerates an ID by default, we can use Omit<*, "id"> when creating new records.
 // For update methods, we accept a Partial of the entity so you can update any subset of fields.

@@ -8,10 +8,10 @@ import {
   GraphEdge,
   GraphNode,
 } from "@/services/graph/interface";
-import { Scene, SceneId } from "@/types/scene";
-import { Generation } from "@/types/generation";
-import { Embedding, EmbeddingId } from "@/types/embedding";
-import { Artefact } from "@/types/artefact";
+import { Scene, SceneId } from "@ontothesia/types/scene";
+import { Generation } from "@ontothesia/types/generation";
+import { Embedding, EmbeddingId } from "@ontothesia/types/embedding";
+import { Artefact } from "@ontothesia/types/artefact";
 
 interface GalleryProps {
   fullNetwork: EmbeddingNetwork;

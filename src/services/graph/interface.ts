@@ -1,5 +1,5 @@
-import { ArtefactId } from "@/types/artefact";
-import { EmbeddingId } from "@/types/embedding";
+import { ArtefactId } from "@ontothesia/types/artefact";
+import { EmbeddingId } from "@ontothesia/types/embedding";
 
 export interface GraphNode {
   id: EmbeddingId;

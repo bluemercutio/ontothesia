@@ -8,9 +8,9 @@ import { useParams } from "next/navigation";
 import DomeScene from "@/components/Dome";
 import { useGetScenesQuery } from "@/store/api";
 import path from "path";
-import { Generation } from "@/types/generation";
-import { Scene } from "@/types/scene";
-import { ExperienceId } from "@/types/experience";
+import { Generation } from "@ontothesia/types/generation";
+import { Scene } from "@ontothesia/types/scene";
+import { ExperienceId } from "@ontothesia/types/experience";
 
 export default function ExperiencePage() {
   const { id } = useParams() as { id: ExperienceId };

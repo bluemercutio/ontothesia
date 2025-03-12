@@ -13,7 +13,9 @@
     "start": "next start",
     "lint": "next lint",
     "start:all": "bash scripts/start-all.sh",
-    "stop:all": "bash scripts/shutdown.sh"
+    "stop:all": "bash scripts/shutdown.sh",
+    "start:db": "bash scripts/start-db.sh",
+    "seed:db": "bash scripts/seed-db.sh"
   },
   "prisma": {
     "schema": "../packages/prisma/prisma/schema.prisma",
@@ -22,6 +24,7 @@
   "dependencies": {
     "@ontothesia/prisma": "*",
     "@ontothesia/storage": "*",
+    "@ontothesia/types": "*",
     "@reduxjs/toolkit": "^2.6.0",
     "@types/styled-components": "^5.1.34",
     "d3": "^7.9.0",

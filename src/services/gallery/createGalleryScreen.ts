@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
-import { Scene } from "@/types/scene";
-import { Generation } from "@/types/generation";
+import { Scene } from "@ontothesia/types/scene";
+import { Generation } from "@ontothesia/types/generation";
 import {
   findGenerationForScene,
   getImageUrlForGeneration,

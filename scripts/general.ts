@@ -1,14 +1,14 @@
 import { createCompletion } from "@/services/open_ai/client";
-import { Artefact } from "@/types/artefact";
-import { Scene } from "@/types/scene";
+import { Artefact } from "@ontothesia/types/artefact";
+import { Scene } from "@ontothesia/types/scene";
 import { v4 as uuidv4 } from "uuid";
 import fs from "node:fs";
 import path from "node:path";
 import dotenv from "dotenv";
 import { artefacts } from "../prisma/artefacts";
 import { createGenerations } from "./generation";
-import { Generation } from "@/types/generation";
-import { Experience } from "@/types/experience";
+import { Generation } from "@ontothesia/types/generation";
+import { Experience } from "@ontothesia/types/experience";
 
 dotenv.config();
 

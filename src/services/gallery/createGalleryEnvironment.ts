@@ -6,8 +6,8 @@ import {
   THREE_SCREEN_ANGLES,
 } from "./constants";
 import { createGalleryScreen } from "./createGalleryScreen";
-import { Scene } from "@/types/scene";
-import { Generation } from "@/types/generation";
+import { Scene } from "@ontothesia/types/scene";
+import { Generation } from "@ontothesia/types/generation";
 
 export const createGalleryEnvironment = (
   scenes: Scene[],

@@ -1,6 +1,6 @@
-import { Experience } from "@/types/experience";
-import { Generation } from "@/types/generation";
-import { Scene } from "@/types/scene";
+import { Experience } from "@ontothesia/types/experience";
+import { Generation } from "@ontothesia/types/generation";
+import { Scene } from "@ontothesia/types/scene";
 
 export const findGenerationForScene = (
   scene: Scene,

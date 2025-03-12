@@ -1,5 +1,5 @@
 // buildEmbeddingTree.ts
-import { Embedding } from "@/types/embedding";
+import { Embedding } from "@ontothesia/types/embedding";
 import { findTopMatches } from "../similarity/similarity";
 
 /**

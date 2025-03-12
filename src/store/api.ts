@@ -1,9 +1,9 @@
-import { Experience } from "@/types/experience";
-import { Scene } from "@/types/scene";
-import { Artefact } from "@/types/artefact";
-import { Embedding } from "@/types/embedding";
+import { Experience } from "@ontothesia/types/experience";
+import { Scene } from "@ontothesia/types/scene";
+import { Artefact } from "@ontothesia/types/artefact";
+import { Embedding } from "@ontothesia/types/embedding";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Generation } from "@/types/generation";
+import { Generation } from "@ontothesia/types/generation";
 
 // Update the BASE_URL to include the full URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api"; // Adjust port if different

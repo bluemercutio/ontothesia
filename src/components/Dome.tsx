@@ -4,8 +4,8 @@ import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 import { createDomeEnvironment } from "../services/dome/environment";
-import { Scene } from "@/types/scene";
-import { Generation } from "@/types/generation";
+import { Scene } from "@ontothesia/types/scene";
+import { Generation } from "@ontothesia/types/generation";
 
 const DomeScene: React.FC<{ scenes: Scene[]; generations: Generation[] }> = ({
   scenes,

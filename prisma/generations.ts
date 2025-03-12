@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { Generation } from "../src/types/generation";
+import { Generation } from "@ontothesia/types/generation";
 export const generations: Generation[] = [
   {
     id: "generation_129546999",

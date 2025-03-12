@@ -1,4 +1,4 @@
-import { Embedding } from "@/types/embedding";
+import { Embedding } from "@ontothesia/types/embedding";
 import { findTopMatches } from "@/services/similarity/similarity";
 import { GraphNode, GraphEdge, EmbeddingNetwork } from "./interface";
 

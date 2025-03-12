@@ -7,8 +7,8 @@ import {
   FADE_DURATION,
   OFFSET_INCREMENT,
 } from "./constants";
-import { Scene } from "@/types/scene";
-import { Generation } from "@/types/generation";
+import { Scene } from "@ontothesia/types/scene";
+import { Generation } from "@ontothesia/types/generation";
 import { createScreen } from "./createScreen";
 
 export function createDomeEnvironment(

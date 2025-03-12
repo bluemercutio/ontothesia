@@ -13,8 +13,8 @@ import { useParams } from "next/navigation";
 import { EmbeddingNetwork, GraphNode } from "@/services/graph/interface";
 import dynamic from "next/dynamic";
 import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
-import { EmbeddingId } from "@/types/embedding";
-import { Scene } from "@/types/scene";
+import { EmbeddingId } from "@ontothesia/types/embedding";
+import { Scene } from "@ontothesia/types/scene";
 const MapButton = dynamic(() => import("@/components/MapButton"), {
   ssr: false,
 });

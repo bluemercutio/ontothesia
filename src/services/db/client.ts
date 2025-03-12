@@ -1,20 +1,89 @@
 // src/services/dbService.ts
 
-import { prisma } from "../prisma/index";
-import { DBService } from "./interface"; // or the same file if you prefer
-import { Artefact, ArtefactId } from "../../types/artefact";
-import { Scene, SceneId } from "../../types/scene";
-import { Experience, ExperienceId } from "../../types/experience";
-import { Embedding, EmbeddingId } from "@/types/embedding";
+import { prisma } from "@ontothesia/prisma";
+import { DBService } from "./interface";
+import { Artefact, ArtefactId } from "@ontothesia/types/artefact";
+import { Scene, SceneId } from "@ontothesia/types/scene";
+import { Experience, ExperienceId } from "@ontothesia/types/experience";
+import { Embedding, EmbeddingId } from "@ontothesia/types/embedding";
+import { Generation } from "@ontothesia/types/generation";
 import { v4 as uuidv4 } from "uuid";
-import { Generation } from "@/types/generation";
+
+// Import Prisma types
+import type {
+  Artefact as PrismaArtefact,
+  Scene as PrismaScene,
+  Experience as PrismaExperience,
+  Embedding as PrismaEmbedding,
+  Generation as PrismaGeneration,
+} from "@prisma/client";
+
+// Define types for Prisma records with included relations
+type ArtefactWithEmbedding = PrismaArtefact & {
+  embedding: PrismaEmbedding | null;
+};
+type SceneWithGeneration = PrismaScene & {
+  generation: PrismaGeneration | null;
+};
+type ExperienceWithScenes = PrismaExperience & { scenes: PrismaScene[] };
+
+// ───────────────────────────────────────────────────────────────────
+// HELPERS: Mapping functions
+// ───────────────────────────────────────────────────────────────────
+
+const mapArtefact = (a: ArtefactWithEmbedding): Artefact => ({
+  id: a.id,
+  title: a.title,
+  text: a.text,
+  region: a.region,
+  approx_date: a.approx_date,
+  citation: a.citation,
+  embedding: a.embedding?.id ?? "",
+});
+
+const mapScene = (s: SceneWithGeneration): Scene => ({
+  id: s.id,
+  title: s.title,
+  context: s.context,
+  artefact: s.artefactId,
+  image_url: s.image_url,
+  video_url: s.video_url ?? "",
+  visualisation: s.visualisation,
+  experience: s.experienceId ?? "",
+  generation: s.generation?.id ?? "",
+});
+
+const mapExperience = (e: ExperienceWithScenes): Experience => ({
+  id: e.id,
+  title: e.title,
+  description: e.description,
+  visible: e.visible,
+  image_url: e.image_url,
+  scenes: e.scenes.map((scene) => scene.id),
+});
+
+const mapEmbedding = (e: PrismaEmbedding): Embedding => ({
+  id: e.id,
+  vector: e.vector,
+  artefactId: e.artefactId,
+});
+
+const mapGeneration = (g: PrismaGeneration): Generation => ({
+  id: g.id,
+  prompt: g.prompt,
+  image_url: g.image_url,
+  artefact: g.artefactId,
+  scene: g.sceneId,
+});
+
+// ───────────────────────────────────────────────────────────────────
+// DB SERVICE IMPLEMENTATION
+// ───────────────────────────────────────────────────────────────────
 
 export const dbService: DBService = {
-  // ───────────────────────────────────────────────────────────────────
-  // ARTEFACT
-  // ───────────────────────────────────────────────────────────────────
+  // ───────── ARTEFACT ─────────
   createArtefact: async (data: Omit<Artefact, "id">): Promise<Artefact> => {
-    const created = await prisma.artefact.create({
+    const created: ArtefactWithEmbedding = await prisma.artefact.create({
       data: {
         id: uuidv4(),
         title: data.title,
@@ -27,46 +96,30 @@ export const dbService: DBService = {
         embedding: true,
       },
     });
-    return {
-      ...created,
-      embedding: created.embedding?.id || "",
-    };
+    return mapArtefact(created);
   },
-  getArtefactById: async (id: ArtefactId): Promise<Artefact | null> => {
-    const artefact = await prisma.artefact.findUnique({
-      where: { id },
-      include: {
-        embedding: true,
-      },
-    });
-    if (!artefact) return null;
-    return {
-      ...artefact,
-      embedding: artefact.embedding?.id || "",
-    };
-  },
-  getAllArtefacts: async (): Promise<Artefact[]> => {
-    const artefacts = await prisma.artefact.findMany({
-      include: {
-        embedding: true,
-      },
-    });
 
-    return artefacts.map((artefact) => {
-      if (!artefact.embedding) {
-        throw new Error(`Embedding missing for artefact ${artefact.id}`);
-      }
-      return {
-        ...artefact,
-        embedding: artefact.embedding.id,
-      };
-    });
+  getArtefactById: async (id: ArtefactId): Promise<Artefact | null> => {
+    const artefact: ArtefactWithEmbedding | null =
+      await prisma.artefact.findUnique({
+        where: { id },
+        include: { embedding: true },
+      });
+    return artefact ? mapArtefact(artefact) : null;
   },
+
+  getAllArtefacts: async (): Promise<Artefact[]> => {
+    const artefacts: ArtefactWithEmbedding[] = await prisma.artefact.findMany({
+      include: { embedding: true },
+    });
+    return artefacts.map(mapArtefact);
+  },
+
   updateArtefact: async (
     id: ArtefactId,
     data: Partial<Artefact>
   ): Promise<Artefact> => {
-    const updated = await prisma.artefact.update({
+    const updated: ArtefactWithEmbedding = await prisma.artefact.update({
       where: { id },
       data: {
         title: data.title,
@@ -75,31 +128,20 @@ export const dbService: DBService = {
         approx_date: data.approx_date,
         citation: data.citation,
       },
-      include: {
-        embedding: true,
-      },
+      include: { embedding: true },
     });
-    return {
-      ...updated,
-      embedding: updated.embedding?.id || "",
-    };
-  },
-  deleteArtefact: async (id: ArtefactId): Promise<Artefact> => {
-    const deleted = await prisma.artefact.delete({
-      where: { id },
-      include: {
-        embedding: true,
-      },
-    });
-    return {
-      ...deleted,
-      embedding: deleted.embedding?.id || "",
-    };
+    return mapArtefact(updated);
   },
 
-  // ───────────────────────────────────────────────────────────────────
-  // SCENE
-  // ───────────────────────────────────────────────────────────────────
+  deleteArtefact: async (id: ArtefactId): Promise<Artefact> => {
+    const deleted: ArtefactWithEmbedding = await prisma.artefact.delete({
+      where: { id },
+      include: { embedding: true },
+    });
+    return mapArtefact(deleted);
+  },
+
+  // ───────── SCENE ─────────
   createScene: async (data: Scene): Promise<Scene> => {
     const {
       artefact: artefactId,
@@ -107,58 +149,34 @@ export const dbService: DBService = {
       generation,
       ...rest
     } = data;
-    const created = await prisma.scene.create({
+    const created: SceneWithGeneration = await prisma.scene.create({
       data: {
+        id: uuidv4(),
         ...rest,
         artefactId,
         experienceId,
-        generation: {
-          connect: { id: generation },
-        },
+        generation: { connect: { id: generation } },
       },
-      include: {
-        artefact: true,
-      },
+      include: { generation: true },
     });
-    return {
-      ...created,
-      artefact: created.artefactId || "",
-      experience: created.experienceId || "",
-      generation: generation || "",
-      video_url: created.video_url || "",
-    };
+    return mapScene(created);
   },
+
   getSceneById: async (id: SceneId): Promise<Scene | null> => {
-    const scene = await prisma.scene.findUnique({
+    const scene: SceneWithGeneration | null = await prisma.scene.findUnique({
       where: { id },
-      include: {
-        generation: true,
-      },
+      include: { generation: true },
     });
-    if (!scene) return null;
-    return {
-      ...scene,
-      artefact: scene.artefactId,
-      experience: scene.experienceId || "",
-      video_url: scene.video_url || "",
-      generation: scene.generation?.id || "",
-    };
+    return scene ? mapScene(scene) : null;
   },
+
   getAllScenes: async (): Promise<Scene[]> => {
-    const scenes = await prisma.scene.findMany({
-      include: {
-        artefact: true,
-        generation: true,
-      },
+    const scenes: SceneWithGeneration[] = await prisma.scene.findMany({
+      include: { generation: true },
     });
-    return scenes.map((scene) => ({
-      ...scene,
-      artefact: scene.artefactId,
-      experience: scene.experienceId || "",
-      video_url: scene.video_url || "",
-      generation: scene.generation?.id || "",
-    }));
+    return scenes.map(mapScene);
   },
+
   updateScene: async (id: SceneId, data: Partial<Scene>): Promise<Scene> => {
     const {
       artefact: artefactId,
@@ -166,7 +184,7 @@ export const dbService: DBService = {
       generation,
       ...rest
     } = data;
-    const updated = await prisma.scene.update({
+    const updated: SceneWithGeneration = await prisma.scene.update({
       where: { id },
       data: {
         ...rest,
@@ -174,101 +192,57 @@ export const dbService: DBService = {
         ...(experienceId && { experienceId }),
         ...(generation && { generation: { connect: { id: generation } } }),
       },
-      include: {
-        artefact: true,
-        generation: true,
-      },
+      include: { generation: true },
     });
-    return {
-      ...updated,
-      artefact: updated.artefactId || "",
-      experience: updated.experienceId || "",
-      generation: updated.generation?.id || "",
-      video_url: updated.video_url || "",
-    };
-  },
-  deleteScene: async (id: SceneId): Promise<Scene> => {
-    const deleted = await prisma.scene.delete({
-      where: { id },
-      include: {
-        artefact: true,
-        generation: true,
-      },
-    });
-    return {
-      ...deleted,
-      artefact: deleted.artefactId || "",
-      experience: deleted.experienceId || "",
-      video_url: deleted.video_url || "",
-      generation: deleted.generation?.id || "",
-    };
+    return mapScene(updated);
   },
 
-  // ───────────────────────────────────────────────────────────────────
-  // EXPERIENCE
-  // ───────────────────────────────────────────────────────────────────
+  deleteScene: async (id: SceneId): Promise<Scene> => {
+    const deleted: SceneWithGeneration = await prisma.scene.delete({
+      where: { id },
+      include: { generation: true },
+    });
+    return mapScene(deleted);
+  },
+
+  // ───────── EXPERIENCE ─────────
   createExperience: async (
     data: Omit<Experience, "id" | "scenes">
   ): Promise<Experience> => {
-    const created = await prisma.experience.create({
+    const created: ExperienceWithScenes = await prisma.experience.create({
       data: {
         title: data.title,
         visible: data.visible,
         description: data.description,
         image_url: data.image_url,
       },
-      include: {
-        scenes: true,
-      },
+      include: { scenes: true },
     });
-    return {
-      id: created.id,
-      title: created.title,
-      description: created.description,
-      visible: created.visible as boolean,
-      image_url: created.image_url,
-      scenes: created.scenes.map((scene) => scene.id),
-    };
+    return mapExperience(created);
   },
+
   getExperienceById: async (id: ExperienceId): Promise<Experience | null> => {
-    const experience = await prisma.experience.findUnique({
-      where: { id },
-      include: {
-        scenes: true,
-      },
-    });
-    if (!experience) return null;
-    return {
-      id: experience.id,
-      title: experience.title,
-      description: experience.description,
-      visible: experience.visible as boolean,
-      image_url: experience.image_url,
-      scenes: experience.scenes.map((scene) => scene.id),
-    };
+    const experience: ExperienceWithScenes | null =
+      await prisma.experience.findUnique({
+        where: { id },
+        include: { scenes: true },
+      });
+    return experience ? mapExperience(experience) : null;
   },
+
   getAllExperiences: async (): Promise<Experience[]> => {
-    const experiences = await prisma.experience.findMany({
-      include: {
-        scenes: true,
-      },
-    });
-    return experiences.map((exp) => {
-      return {
-        id: exp.id,
-        title: exp.title,
-        description: exp.description,
-        visible: exp.visible,
-        image_url: exp.image_url,
-        scenes: exp.scenes.map((scene) => scene.id),
-      };
-    });
+    const experiences: ExperienceWithScenes[] =
+      await prisma.experience.findMany({
+        include: { scenes: true },
+      });
+    return experiences.map(mapExperience);
   },
+
   updateExperience: async (
     id: ExperienceId,
     data: Partial<Omit<Experience, "id" | "scenes">>
   ): Promise<Experience> => {
-    const updated = await prisma.experience.update({
+    const updated: ExperienceWithScenes = await prisma.experience.update({
       where: { id },
       data: {
         ...(data.title !== undefined && { title: data.title }),
@@ -278,99 +252,69 @@ export const dbService: DBService = {
         }),
         ...(data.image_url !== undefined && { image_url: data.image_url }),
       },
-      include: {
-        scenes: true,
-      },
+      include: { scenes: true },
     });
-    return {
-      id: updated.id,
-      title: updated.title,
-      description: updated.description,
-      visible: updated.visible as boolean,
-      image_url: updated.image_url,
-      scenes: updated.scenes.map((scene) => scene.id),
-    };
+    return mapExperience(updated);
   },
+
   deleteExperience: async (id: ExperienceId): Promise<Experience> => {
-    const deleted = await prisma.experience.delete({
+    const deleted: ExperienceWithScenes = await prisma.experience.delete({
       where: { id },
-      include: {
-        scenes: true,
-      },
+      include: { scenes: true },
     });
-    return {
-      id: deleted.id,
-      title: deleted.title,
-      description: deleted.description,
-      visible: deleted.visible as boolean,
-      image_url: deleted.image_url,
-      scenes: deleted.scenes.map((scene) => scene.id),
-    };
+    return mapExperience(deleted);
   },
 
-  // ───────────────────────────────────────────────────────────────────
-  // EMBEDDING
-  // ───────────────────────────────────────────────────────────────────
-
+  // ───────── EMBEDDING ─────────
   createEmbedding: async (data: Omit<Embedding, "id">): Promise<Embedding> => {
-    const { artefactId, vector } = data;
-    return prisma.embedding.create({
+    const created = await prisma.embedding.create({
       data: {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         text: "", // Required by Prisma schema
-        vector,
-        artefactId,
+        vector: data.vector,
+        artefactId: data.artefactId,
       },
     });
+    return mapEmbedding(created);
   },
+
   getEmbeddingById: async (id: EmbeddingId): Promise<Embedding | null> => {
-    return prisma.embedding.findUnique({ where: { id } });
+    const embedding = await prisma.embedding.findUnique({ where: { id } });
+    return embedding ? mapEmbedding(embedding) : null;
   },
+
   getAllEmbeddings: async (): Promise<Embedding[]> => {
-    return prisma.embedding.findMany();
+    const embeddings = await prisma.embedding.findMany();
+    return embeddings.map(mapEmbedding);
   },
+
   getEmbeddingByArtefactId: async (
     artefactId: ArtefactId
   ): Promise<Embedding | null> => {
-    return prisma.embedding.findFirst({ where: { artefactId } });
+    const embedding = await prisma.embedding.findFirst({
+      where: { artefactId },
+    });
+    return embedding ? mapEmbedding(embedding) : null;
   },
 
-  // ───────────────────────────────────────────────────────────────────
-  // GENERATION
-  // ───────────────────────────────────────────────────────────────────
+  // ───────── GENERATION ─────────
   createGeneration: async (
     data: Omit<Generation, "id">
   ): Promise<Generation> => {
     const created = await prisma.generation.create({
       data: {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         image_url: data.image_url,
         prompt: data.prompt,
         artefactId: data.artefact,
         sceneId: data.scene,
       },
-      include: {
-        artefact: true,
-        scene: true,
-      },
     });
-    return {
-      ...created,
-      artefact: created.artefactId,
-      scene: created.sceneId,
-    };
+    return mapGeneration(created);
   },
+
   getAllGenerations: async (): Promise<Generation[]> => {
-    const generations = await prisma.generation.findMany({
-      include: {
-        artefact: true,
-        scene: true,
-      },
-    });
-    return generations.map((gen) => ({
-      ...gen,
-      artefact: gen.artefactId,
-      scene: gen.sceneId,
-    }));
+    const generations = await prisma.generation.findMany();
+    return generations.map(mapGeneration);
   },
 };
