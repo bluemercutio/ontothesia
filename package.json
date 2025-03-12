@@ -1,7 +1,6 @@
 {
   "name": "ontothesia",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "scripts": {
     "db-seed": "tsx prisma/seed.ts",
@@ -17,10 +16,12 @@
     "stop:all": "bash scripts/shutdown.sh"
   },
   "prisma": {
+    "schema": "../packages/prisma/prisma/schema.prisma",
     "seed": "npm run db-seed"
   },
   "dependencies": {
-    "@prisma/client": "^6.0.1",
+    "@ontothesia/prisma": "*",
+    "@ontothesia/storage": "*",
     "@reduxjs/toolkit": "^2.6.0",
     "@types/styled-components": "^5.1.34",
     "d3": "^7.9.0",
@@ -44,12 +45,12 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.174.0",
+    "autoprefixer": "^10.4.21",
     "axios": "^1.8.2",
     "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
     "postcss": "^8",
-    "prisma": "^6.0.1",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",

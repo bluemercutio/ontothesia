@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 import { getExperienceGenerationsMap } from "@/services/utils/generations";
 import { getRandomImageUrls } from "@/services/utils/images";
-import { Experience } from "@prisma/client";
+import { Experience } from "@/types/experience";
 
 export default function Gallery() {
   const [visibleExperiences, setVisibleExperiences] = useState<Experience[]>(

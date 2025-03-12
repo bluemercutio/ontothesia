@@ -1,6 +1,6 @@
 // src/services/dbService.ts
 
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../prisma/index";
 import { DBService } from "./interface"; // or the same file if you prefer
 import { Artefact, ArtefactId } from "../../types/artefact";
 import { Scene, SceneId } from "../../types/scene";
@@ -8,7 +8,6 @@ import { Experience, ExperienceId } from "../../types/experience";
 import { Embedding, EmbeddingId } from "@/types/embedding";
 import { v4 as uuidv4 } from "uuid";
 import { Generation } from "@/types/generation";
-const prisma = new PrismaClient();
 
 export const dbService: DBService = {
   // ───────────────────────────────────────────────────────────────────
@@ -52,10 +51,16 @@ export const dbService: DBService = {
         embedding: true,
       },
     });
-    return artefacts.map((artefact) => ({
-      ...artefact,
-      embedding: artefact.embedding?.id || "",
-    }));
+
+    return artefacts.map((artefact) => {
+      if (!artefact.embedding) {
+        throw new Error(`Embedding missing for artefact ${artefact.id}`);
+      }
+      return {
+        ...artefact,
+        embedding: artefact.embedding.id,
+      };
+    });
   },
   updateArtefact: async (
     id: ArtefactId,

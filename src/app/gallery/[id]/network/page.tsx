@@ -57,7 +57,6 @@ export default function GalleryRoom(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    console.log("Experience final: ", experience);
     const handleMouseMove = () => resetTimer();
     window.addEventListener("mousemove", handleMouseMove);
     resetTimer(); // Initial setup

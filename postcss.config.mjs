@@ -2,7 +2,9 @@
 const config = {
   plugins: {
     tailwindcss: {},
+    autoprefixer: {},
   },
 };
 
+// ESM export
 export default config;

@@ -102,7 +102,7 @@ const downloadAndSaveImage = async (imageUrl: string) => {
       );
 
       // Save the image using absolute path
-      fs.writeFileSync(absolutePath, response.data);
+      fs.writeFileSync(absolutePath, response.data as Buffer);
 
       // Return just the filename - we'll construct the env path when saving to generations.ts
       return fileName;
