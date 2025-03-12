@@ -1,4 +1,4 @@
-import { StableDiffusionResponse } from "@/types/generation";
+import { StableDiffusionResponse } from "@ontothesia/types/generation";
 import { TEXT2IMG_URL } from "./constants";
 
 export const createStableDiffusionGeneration = async (
