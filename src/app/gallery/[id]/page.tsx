@@ -1,14 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Card from "@/components/Card";
 import { useGetExperienceByIdQuery, useGetGenerationsQuery } from "@/store/api";
-import { getRandomImageUrls } from "@/services/utils/images";
-import { getExperienceGenerationsMap } from "@/services/utils/generations";
 
 export default function GalleryOptions() {
   const { id } = useParams() as { id: string };
+  const searchParams = useSearchParams();
+  if (!searchParams) {
+    throw new Error("No search params found");
+  }
+  const imageUrl = searchParams.get("imageUrl");
+  if (!imageUrl) {
+    throw new Error("No image URL found");
+  }
   const router = useRouter();
 
   const {
@@ -31,10 +36,6 @@ export default function GalleryOptions() {
     errorGenerations
   )
     return null;
-  // Create a map of experience ID to its scene-specific generations
-  const experienceGenerations = getExperienceGenerationsMap(generations, [
-    experience,
-  ]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -44,14 +45,7 @@ export default function GalleryOptions() {
           <div className="flex-1 max-w-md">
             <h1 className="text-2xl font-bold mb-4">{experience.title}</h1>
             <p className="text-lg pb-10">{experience.description}</p>
-            <Card
-              imageUrls={getRandomImageUrls(
-                experienceGenerations[experience.id] || [],
-                8
-              )}
-              width="w-96"
-              height="h-96"
-            />
+            <Card imageUrl={imageUrl} width="w-96" height="h-96" />
           </div>
 
           {/* Right side stacked cards */}

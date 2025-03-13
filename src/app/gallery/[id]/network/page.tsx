@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, JSX } from "react";
+import React, { useState, useEffect, useCallback, JSX, useRef } from "react";
 import Gallery from "@/components/Gallery";
 import {
   useGetEmbeddingsQuery,
-  useGetGenerationsQuery,
   useGetScenesQuery,
   useGetArtefactsQuery,
   useGetExperienceByIdQuery,
@@ -37,37 +36,30 @@ export default function GalleryRoom(): JSX.Element {
   const { data: artefacts, isLoading: artefactsLoading } =
     useGetArtefactsQuery();
   const { data: scenes, isLoading: scenesLoading } = useGetScenesQuery();
-  const { data: generations, isLoading: generationsLoading } =
-    useGetGenerationsQuery();
 
   const [fullNetwork, setFullNetwork] = useState<EmbeddingNetwork | null>(null);
   const [currentNodeId, setCurrentNodeId] = useState<EmbeddingId | null>(null);
   const [isMapVisible, setIsMapVisible] = useState(true);
   const [experienceScenes, setExperienceScenes] = useState<Scene[]>([]);
-  const timeoutRef = React.useRef<number>(window.setTimeout(() => {}, 0));
+  const timeoutRef = useRef<number | undefined>(undefined);
 
   const resetTimer = useCallback(() => {
     if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current);
     }
-    setIsMapVisible(true);
     timeoutRef.current = window.setTimeout(() => {
       setIsMapVisible(false);
-    }, 2000);
+    }, 3000);
   }, []);
 
   useEffect(() => {
-    const handleMouseMove = () => resetTimer();
-    window.addEventListener("mousemove", handleMouseMove);
-    resetTimer(); // Initial setup
-
+    resetTimer();
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
       if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
+        clearTimeout(timeoutRef.current);
       }
     };
-  }, [resetTimer, experience]); // Only depend on the memoized resetTimer function
+  }, [resetTimer]);
 
   useEffect(() => {
     if (embeddings && artefacts && experience && scenes) {
@@ -117,12 +109,10 @@ export default function GalleryRoom(): JSX.Element {
   if (
     embeddingsLoading ||
     scenesLoading ||
-    generationsLoading ||
     artefactsLoading ||
     !fullNetwork ||
     !currentNodeId ||
     !embeddings ||
-    !generations ||
     !scenes ||
     !artefacts ||
     !experience
@@ -142,7 +132,6 @@ export default function GalleryRoom(): JSX.Element {
           fullNetwork={fullNetwork}
           currentNodeId={currentNodeId}
           embeddings={embeddings}
-          generations={generations}
           artefacts={artefacts}
           scenes={experienceScenes}
           onNodeChange={handleNodeChange}

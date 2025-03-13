@@ -1,27 +1,15 @@
 import * as THREE from "three";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
-import { Scene } from "@ontothesia/types/scene";
-import { Generation } from "@ontothesia/types/generation";
-import {
-  findGenerationForScene,
-  getImageUrlForGeneration,
-} from "../utils/generations";
+import { EnhancedScene } from "@ontothesia/types/scene";
 import { vertexShader } from "./shaders";
 import { fragmentShader } from "./shaders";
 
-export const createGalleryScreen = (
-  scene: Scene,
-  generations: Generation[]
-): THREE.Mesh => {
+export const createGalleryScreen = (scene: EnhancedScene): THREE.Mesh => {
   const geometry = new THREE.PlaneGeometry(SCREEN_WIDTH, SCREEN_HEIGHT);
-  const generation = findGenerationForScene(scene, generations);
-  if (!generation) {
-    throw new Error("No generation found for scene");
-  }
-  const imageUrl = getImageUrlForGeneration(generation);
+
   const textureLoader = new THREE.TextureLoader();
   const texture = textureLoader.load(
-    imageUrl,
+    scene.processedImageUrl,
     (loadedTexture) => {
       loadedTexture.minFilter = THREE.LinearFilter;
       loadedTexture.magFilter = THREE.LinearFilter;
@@ -33,6 +21,7 @@ export const createGalleryScreen = (
       console.error("Error loading texture:", error);
     }
   );
+
   const material = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
@@ -44,6 +33,7 @@ export const createGalleryScreen = (
     side: THREE.DoubleSide,
     transparent: true,
   });
+
   const mesh = new THREE.Mesh(geometry, material);
   mesh.userData.scene = scene;
   return mesh;

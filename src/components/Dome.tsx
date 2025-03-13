@@ -4,16 +4,15 @@ import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 import { createDomeEnvironment } from "../services/dome/environment";
-import { Scene } from "@ontothesia/types/scene";
-import { Generation } from "@ontothesia/types/generation";
+import { EnhancedScene } from "@ontothesia/types/scene";
 
-const DomeScene: React.FC<{ scenes: Scene[]; generations: Generation[] }> = ({
-  scenes,
-  generations,
-}) => {
+const DomeScene: React.FC<{ scenes: EnhancedScene[] }> = ({ scenes }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
+  // Main Three.js setup effect
   useEffect(() => {
+    if (scenes.length === 0) return;
+
     const mount = mountRef.current;
     if (!mount) return;
 
@@ -48,7 +47,7 @@ const DomeScene: React.FC<{ scenes: Scene[]; generations: Generation[] }> = ({
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
 
-    const domeGroup = createDomeEnvironment(5, scenes, generations);
+    const domeGroup = createDomeEnvironment(5, scenes);
     scene.add(domeGroup);
 
     const clock = new THREE.Clock();
@@ -86,7 +85,7 @@ const DomeScene: React.FC<{ scenes: Scene[]; generations: Generation[] }> = ({
       mount.removeChild(renderer.domElement);
       renderer.dispose();
     };
-  }, [scenes, generations]);
+  }, [scenes]);
 
   return <div ref={mountRef} style={{ width: "100%", height: "100vh" }} />;
 };
