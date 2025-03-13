@@ -1,5 +1,5 @@
 import React from "react";
-import { Artefact as ArtefactType } from "@ontothesia/types/artefact";
+import { Artefact as ArtefactType } from "@arkology-studio/ontothesia-types/artefact";
 
 const Artefact: React.FC<ArtefactType> = ({ text, region, approx_date }) => {
   return (

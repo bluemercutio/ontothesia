@@ -1,4 +1,4 @@
-import { Scene } from "@ontothesia/types/scene";
+import { Scene } from "@arkology-studio/ontothesia-types/scene";
 import { createStableDiffusionGeneration } from "@/services/stable_diffusion/client";
 // import { scenes } from "../prisma/scenes";
 import fs from "node:fs";
@@ -6,10 +6,10 @@ import { writeFile } from "node:fs/promises";
 import { artefacts } from "../prisma/artefacts";
 import dotenv from "dotenv";
 
-import { Generation } from "@ontothesia/types/generation";
+import { Generation } from "@arkology-studio/ontothesia-types/generation";
 import path from "path";
 import axios from "axios";
-import { Artefact } from "@ontothesia/types/artefact";
+import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 import { v4 as uuidv4 } from "uuid";
 
 // Add this near the top of the file, before any code that uses process.env

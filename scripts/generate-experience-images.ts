@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createSlicedImage } from "./experience.js";
-import { Scene } from "@ontothesia/types/scene";
+import { Scene } from "@arkology-studio/ontothesia-types/scene";
 import { v4 as uuidv4 } from "uuid";
 
 // ES Modules replacement for __dirname

@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 import { createDomeEnvironment } from "../services/dome/environment";
-import { EnhancedScene } from "@ontothesia/types/scene";
+import { EnhancedScene } from "@arkology-studio/ontothesia-types/scene";
 
 const DomeScene: React.FC<{ scenes: EnhancedScene[] }> = ({ scenes }) => {
   const mountRef = useRef<HTMLDivElement>(null);

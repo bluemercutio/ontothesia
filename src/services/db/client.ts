@@ -1,12 +1,21 @@
 // src/services/dbService.ts
 
-import { prisma } from "@ontothesia/prisma";
+import { prisma } from "@arkology-studio/ontothesia-prisma";
 import { DBService } from "./interface";
-import { Artefact, ArtefactId } from "@ontothesia/types/artefact";
-import { Scene, SceneId } from "@ontothesia/types/scene";
-import { Experience, ExperienceId } from "@ontothesia/types/experience";
-import { Embedding, EmbeddingId } from "@ontothesia/types/embedding";
-import { Generation } from "@ontothesia/types/generation";
+import {
+  Artefact,
+  ArtefactId,
+} from "@arkology-studio/ontothesia-types/artefact";
+import { Scene, SceneId } from "@arkology-studio/ontothesia-types/scene";
+import {
+  Experience,
+  ExperienceId,
+} from "@arkology-studio/ontothesia-types/experience";
+import {
+  Embedding,
+  EmbeddingId,
+} from "@arkology-studio/ontothesia-types/embedding";
+import { Generation } from "@arkology-studio/ontothesia-types/generation";
 import { v4 as uuidv4 } from "uuid";
 
 import {

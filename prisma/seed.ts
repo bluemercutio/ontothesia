@@ -4,9 +4,9 @@ import { embeddings } from "./embeddings";
 import fs from "node:fs";
 
 import path from "path";
-import { Experience } from "@ontothesia/types/experience";
-import { Scene } from "@ontothesia/types/scene";
-import { Generation } from "@ontothesia/types/generation";
+import { Experience } from "@arkology-studio/ontothesia-types/experience";
+import { Scene } from "@arkology-studio/ontothesia-types/scene";
+import { Generation } from "@arkology-studio/ontothesia-types/generation";
 const prisma = new PrismaClient();
 import * as dotenv from "dotenv";
 

@@ -1,4 +1,4 @@
-import { Artefact } from "@ontothesia/types/artefact";
+import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 
 export const artefacts: Artefact[] = [
   {

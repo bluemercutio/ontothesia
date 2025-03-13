@@ -8,8 +8,8 @@ import { useParams } from "next/navigation";
 import DomeScene from "@/components/Dome";
 import { useGetScenesQuery } from "@/store/api";
 
-import { Scene } from "@ontothesia/types/scene";
-import { ExperienceId } from "@ontothesia/types/experience";
+import { Scene } from "@arkology-studio/ontothesia-types/scene";
+import { ExperienceId } from "@arkology-studio/ontothesia-types/experience";
 
 interface EnhancedScene extends Scene {
   processedImageUrl: string;

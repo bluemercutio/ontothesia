@@ -6,7 +6,7 @@ import {
   THREE_SCREEN_ANGLES,
 } from "./constants";
 import { createGalleryScreen } from "./createGalleryScreen";
-import { EnhancedScene } from "@ontothesia/types/scene";
+import { EnhancedScene } from "@arkology-studio/ontothesia-types/scene";
 
 export const createGalleryEnvironment = (
   scenes: EnhancedScene[]

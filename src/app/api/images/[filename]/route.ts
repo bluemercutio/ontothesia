@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
-import { getSignedUrlForFile } from "@ontothesia/storage";
-import { DigitalOceanConfig } from "@ontothesia/types/digital_ocean";
+import { getSignedUrlForFile } from "@arkology-studio/ontothesia-storage";
+import { DigitalOceanConfig } from "@arkology-studio/ontothesia-types/digital_ocean";
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ filename: string }> }

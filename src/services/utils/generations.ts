@@ -1,6 +1,6 @@
-import { Experience } from "@ontothesia/types/experience";
-import { Generation } from "@ontothesia/types/generation";
-import { Scene } from "@ontothesia/types/scene";
+import { Experience } from "@arkology-studio/ontothesia-types/experience";
+import { Generation } from "@arkology-studio/ontothesia-types/generation";
+import { Scene } from "@arkology-studio/ontothesia-types/scene";
 
 export const findGenerationForScene = (
   scene: Scene,

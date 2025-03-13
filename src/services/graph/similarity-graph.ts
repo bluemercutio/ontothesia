@@ -1,4 +1,4 @@
-import { Embedding } from "@ontothesia/types/embedding";
+import { Embedding } from "@arkology-studio/ontothesia-types/embedding";
 import { findTopMatches } from "@/services/similarity/similarity";
 import { GraphNode, GraphEdge, EmbeddingNetwork } from "./interface";
 

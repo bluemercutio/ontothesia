@@ -8,9 +8,16 @@ import {
   GraphEdge,
   GraphNode,
 } from "@/services/graph/interface";
-import { Scene, SceneId, EnhancedScene } from "@ontothesia/types/scene";
-import { Embedding, EmbeddingId } from "@ontothesia/types/embedding";
-import { Artefact } from "@ontothesia/types/artefact";
+import {
+  Scene,
+  SceneId,
+  EnhancedScene,
+} from "@arkology-studio/ontothesia-types/scene";
+import {
+  Embedding,
+  EmbeddingId,
+} from "@arkology-studio/ontothesia-types/embedding";
+import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 
 interface GalleryProps {
   fullNetwork: EmbeddingNetwork;

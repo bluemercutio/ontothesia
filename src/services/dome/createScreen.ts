@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { EnhancedScene } from "@ontothesia/types/scene";
+import { EnhancedScene } from "@arkology-studio/ontothesia-types/scene";
 import { vertexShader, fragmentShader } from "./shaders";
 
 export const createScreen = (

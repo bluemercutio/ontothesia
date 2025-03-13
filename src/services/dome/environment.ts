@@ -7,7 +7,7 @@ import {
   FADE_DURATION,
   OFFSET_INCREMENT,
 } from "./constants";
-import { EnhancedScene } from "@ontothesia/types/scene";
+import { EnhancedScene } from "@arkology-studio/ontothesia-types/scene";
 import { createScreen } from "./createScreen";
 
 export function createDomeEnvironment(

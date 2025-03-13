@@ -6,7 +6,7 @@ import Carousel from "@/components/Carousel";
 import Header from "@/components/Header";
 import { useGetExperiencesQuery } from "@/store/api";
 import { useRouter } from "next/navigation";
-import { Experience } from "@ontothesia/types/experience";
+import { Experience } from "@arkology-studio/ontothesia-types/experience";
 
 interface EnhancedExperience extends Experience {
   processedImageUrl: string;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Network } from "./Network";
 import { EmbeddingNetwork, GraphNode } from "../services/graph/interface";
-import { Artefact } from "@ontothesia/types/artefact";
+import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 
 interface MapButtonProps {
   isVisible?: boolean;

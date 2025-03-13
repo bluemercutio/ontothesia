@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
-import { EnhancedScene } from "@ontothesia/types/scene";
+import { EnhancedScene } from "@arkology-studio/ontothesia-types/scene";
 import { vertexShader } from "./shaders";
 import { fragmentShader } from "./shaders";
 
