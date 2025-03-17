@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, JSX } from "react";
+import React, { useState, useEffect, useCallback, JSX, useRef } from "react";
 import Gallery from "@/components/Gallery";
 import {
   useGetEmbeddingsQuery,
-  useGetGenerationsQuery,
   useGetScenesQuery,
   useGetArtefactsQuery,
   useGetExperienceByIdQuery,
@@ -13,8 +12,8 @@ import { useParams } from "next/navigation";
 import { EmbeddingNetwork, GraphNode } from "@/services/graph/interface";
 import dynamic from "next/dynamic";
 import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
-import { EmbeddingId } from "@/types/embedding";
-import { Scene } from "@/types/scene";
+import { EmbeddingId } from "@arkology-studio/ontothesia-types/embedding";
+import { Scene } from "@arkology-studio/ontothesia-types/scene";
 const MapButton = dynamic(() => import("@/components/MapButton"), {
   ssr: false,
 });
@@ -37,38 +36,30 @@ export default function GalleryRoom(): JSX.Element {
   const { data: artefacts, isLoading: artefactsLoading } =
     useGetArtefactsQuery();
   const { data: scenes, isLoading: scenesLoading } = useGetScenesQuery();
-  const { data: generations, isLoading: generationsLoading } =
-    useGetGenerationsQuery();
 
   const [fullNetwork, setFullNetwork] = useState<EmbeddingNetwork | null>(null);
   const [currentNodeId, setCurrentNodeId] = useState<EmbeddingId | null>(null);
   const [isMapVisible, setIsMapVisible] = useState(true);
   const [experienceScenes, setExperienceScenes] = useState<Scene[]>([]);
-  const timeoutRef = React.useRef<number>(window.setTimeout(() => {}, 0));
+  const timeoutRef = useRef<number | undefined>(undefined);
 
   const resetTimer = useCallback(() => {
     if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current);
     }
-    setIsMapVisible(true);
     timeoutRef.current = window.setTimeout(() => {
       setIsMapVisible(false);
-    }, 2000);
+    }, 3000);
   }, []);
 
   useEffect(() => {
-    console.log("Experience final: ", experience);
-    const handleMouseMove = () => resetTimer();
-    window.addEventListener("mousemove", handleMouseMove);
-    resetTimer(); // Initial setup
-
+    resetTimer();
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
       if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
+        clearTimeout(timeoutRef.current);
       }
     };
-  }, [resetTimer, experience]); // Only depend on the memoized resetTimer function
+  }, [resetTimer]);
 
   useEffect(() => {
     if (embeddings && artefacts && experience && scenes) {
@@ -118,12 +109,10 @@ export default function GalleryRoom(): JSX.Element {
   if (
     embeddingsLoading ||
     scenesLoading ||
-    generationsLoading ||
     artefactsLoading ||
     !fullNetwork ||
     !currentNodeId ||
     !embeddings ||
-    !generations ||
     !scenes ||
     !artefacts ||
     !experience
@@ -143,7 +132,6 @@ export default function GalleryRoom(): JSX.Element {
           fullNetwork={fullNetwork}
           currentNodeId={currentNodeId}
           embeddings={embeddings}
-          generations={generations}
           artefacts={artefacts}
           scenes={experienceScenes}
           onNodeChange={handleNodeChange}

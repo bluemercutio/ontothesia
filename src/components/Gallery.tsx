@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import * as THREE from "three";
 import { createGalleryEnvironment } from "../services/gallery/createGalleryEnvironment";
 import {
@@ -8,16 +8,21 @@ import {
   GraphEdge,
   GraphNode,
 } from "@/services/graph/interface";
-import { Scene, SceneId } from "@/types/scene";
-import { Generation } from "@/types/generation";
-import { Embedding, EmbeddingId } from "@/types/embedding";
-import { Artefact } from "@/types/artefact";
+import {
+  Scene,
+  SceneId,
+  EnhancedScene,
+} from "@arkology-studio/ontothesia-types/scene";
+import {
+  Embedding,
+  EmbeddingId,
+} from "@arkology-studio/ontothesia-types/embedding";
+import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 
 interface GalleryProps {
   fullNetwork: EmbeddingNetwork;
   currentNodeId: string;
   embeddings: Embedding[];
-  generations: Generation[];
   artefacts: Artefact[];
   scenes: Scene[];
   onNodeChange: (node: GraphNode) => void;
@@ -27,7 +32,6 @@ const Gallery: React.FC<GalleryProps> = ({
   fullNetwork,
   currentNodeId,
   embeddings,
-  generations,
   artefacts,
   scenes,
   onNodeChange,
@@ -40,6 +44,8 @@ const Gallery: React.FC<GalleryProps> = ({
   const raycaster = useRef(new THREE.Raycaster()).current;
   const mouse = useRef(new THREE.Vector2()).current;
   const creationCount = useRef(0);
+  const [processedScenes, setProcessedScenes] = useState<EnhancedScene[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const onClick = useCallback(
     (event: MouseEvent): void => {
@@ -87,6 +93,61 @@ const Gallery: React.FC<GalleryProps> = ({
     },
     [mouse, raycaster, embeddings, onNodeChange, fullNetwork, currentNodeId]
   );
+
+  // Update the useEffect that processes images
+  useEffect(() => {
+    const processSceneImages = async () => {
+      setIsLoading(true);
+      try {
+        const processed = await Promise.all(
+          scenes.map(async (scene) => {
+            const filename = scene.image_url.split("/").pop();
+            const apiUrl = `/api/images/${filename}?folder=${process.env.NEXT_PUBLIC_SCENE_IMAGES_KEY}`;
+
+            try {
+              const response = await fetch(apiUrl);
+              if (!response.ok) {
+                console.error(`Failed to fetch image for scene ${scene.id}`);
+                return {
+                  ...scene,
+                  processedImageUrl: apiUrl,
+                };
+              }
+
+              const blob = await response.blob();
+              const objectUrl = URL.createObjectURL(blob);
+
+              return {
+                ...scene,
+                processedImageUrl: objectUrl,
+              };
+            } catch (error) {
+              console.error(`Error processing scene ${scene.id}:`, error);
+              return {
+                ...scene,
+                processedImageUrl: apiUrl,
+              };
+            }
+          })
+        );
+        setProcessedScenes(processed);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (scenes.length > 0) {
+      processSceneImages();
+    }
+
+    return () => {
+      processedScenes.forEach((scene) => {
+        if (scene.processedImageUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(scene.processedImageUrl);
+        }
+      });
+    };
+  }, [scenes]);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -179,7 +240,9 @@ const Gallery: React.FC<GalleryProps> = ({
       }
     });
     console.log("sceneIds", sceneIds);
-    const currentScenes = scenes.filter((sc) => sceneIds.includes(sc.id));
+    const currentScenes = processedScenes.filter((sc) =>
+      sceneIds.includes(sc.id)
+    );
 
     // Log before gallery creation
     console.log("Creating gallery environment", {
@@ -187,7 +250,7 @@ const Gallery: React.FC<GalleryProps> = ({
       nodeId: currentNodeId,
     });
 
-    const galleryGroup = createGalleryEnvironment(currentScenes, generations);
+    const galleryGroup = createGalleryEnvironment(currentScenes);
     galleryGroupRef.current = galleryGroup;
     scene.add(galleryGroup);
 
@@ -223,13 +286,22 @@ const Gallery: React.FC<GalleryProps> = ({
     };
   }, [
     scenes,
-    generations,
+    processedScenes,
     onClick,
     artefacts,
     embeddings,
     currentNodeId,
     fullNetwork,
   ]);
+
+  // Update the return statement to show loading state
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="text-2xl">Loading Experience...</div>
+      </div>
+    );
+  }
 
   return <div ref={mountRef} className="w-full h-screen cursor-pointer" />;
 };

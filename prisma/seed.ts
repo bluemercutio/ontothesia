@@ -4,21 +4,59 @@ import { embeddings } from "./embeddings";
 import fs from "node:fs";
 
 import path from "path";
-import { Experience } from "../src/types/experience";
-import { Scene } from "../src/types/scene";
-import { Generation } from "../src/types/generation";
+import { Experience } from "@arkology-studio/ontothesia-types/experience";
+import { Scene } from "@arkology-studio/ontothesia-types/scene";
+import { Generation } from "@arkology-studio/ontothesia-types/generation";
 const prisma = new PrismaClient();
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 async function main() {
+  console.log(
+    "process.env.NEXT_PUBLIC_PRISMA_DIR",
+    process.env.NEXT_PUBLIC_PRISMA_DIR
+  );
   if (!process.env.NEXT_PUBLIC_PRISMA_DIR) {
     throw new Error("NEXT_PUBLIC_PRISMA_DIR is not set");
   }
   console.log("Start seeding...");
 
   // Delete existing records in correct order (respecting foreign key constraints)
-  await prisma.scene.deleteMany();
-  await prisma.embedding.deleteMany();
-  await prisma.artefact.deleteMany();
+  try {
+    await prisma.generation.deleteMany();
+    console.log("Deleted all generations");
+  } catch {
+    console.log("Generation table might not exist yet, continuing...");
+  }
+
+  try {
+    await prisma.scene.deleteMany();
+    console.log("Deleted all scenes");
+  } catch {
+    console.log("Scene table might not exist yet, continuing...");
+  }
+
+  try {
+    await prisma.experience.deleteMany();
+    console.log("Deleted all experiences");
+  } catch {
+    console.log("Experience table might not exist yet, continuing...");
+  }
+
+  try {
+    await prisma.embedding.deleteMany();
+    console.log("Deleted all embeddings");
+  } catch {
+    console.log("Embedding table might not exist yet, continuing...");
+  }
+
+  try {
+    await prisma.artefact.deleteMany();
+    console.log("Deleted all artefacts");
+  } catch {
+    console.log("Artefact table might not exist yet, continuing...");
+  }
 
   for (const artefact of artefacts) {
     const embedding = embeddings.find((e) => e.artefactId === artefact.id);
@@ -209,8 +247,7 @@ async function main() {
             id: scene.artefact,
           },
         },
-        image_url:
-          "/api/proxy-image?url=https%3A%2F%2Fimg.freepik.com%2Ffree-psd%2Fcosmic-nebula-celestial-tapestry-stars-gas_632498-24057.jpg%3Fsemt%3Dais_hybrid",
+        image_url: scene.image_url,
         video_url: scene.video_url || "",
         visualisation: scene.visualisation,
         experience: {

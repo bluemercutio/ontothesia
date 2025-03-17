@@ -1,32 +1,71 @@
 import { NextResponse, NextRequest } from "next/server";
-import path from "path";
-import { promises as fs } from "fs";
-
+import { getSignedUrlForFile } from "@arkology-studio/ontothesia-storage";
+import { DigitalOceanConfig } from "@arkology-studio/ontothesia-types/digital_ocean";
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ filename: string }> }
 ) {
   try {
-    if (!process.env.NEXT_PUBLIC_GENERATIONS_DIR) {
-      throw new Error("NEXT_PUBLIC_GENERATIONS_DIR is not set");
+    const { filename } = await context.params;
+    const { searchParams } = new URL(request.url);
+    const folder = searchParams.get("folder");
+
+    console.log("Received request for:");
+    console.log("Original filename:", filename);
+    console.log("Folder:", folder);
+
+    // Decode the filename in case it's URL encoded
+    const decodedFilename = decodeURIComponent(filename);
+    console.log("Decoded filename:", decodedFilename);
+
+    if (
+      !process.env.DO_SPACES_REGION ||
+      !process.env.DO_SPACES_BUCKET ||
+      !process.env.DO_SPACES_KEY ||
+      !process.env.DO_SPACES_SECRET
+    ) {
+      throw new Error(
+        "Missing required Digital Ocean Spaces environment variables"
+      );
     }
 
-    const { filename } = await context.params;
-    const filePath = path.join(
-      process.env.NEXT_PUBLIC_GENERATIONS_DIR,
-      "images",
-      filename
-    );
+    // Pass required environment variables explicitly to overcome the limitation
+    const doConfig: DigitalOceanConfig = {
+      DO_SPACES_REGION: process.env.DO_SPACES_REGION,
+      DO_SPACES_BUCKET: process.env.DO_SPACES_BUCKET,
+      DO_SPACES_KEY: process.env.DO_SPACES_KEY,
+      DO_SPACES_SECRET: process.env.DO_SPACES_SECRET,
+    };
 
-    const fileBuffer = await fs.readFile(filePath);
+    // Construct key with .png extension
+    const key = `${folder}/${decodedFilename}`;
+    console.log("Fetching image with key:", key);
 
-    return new NextResponse(fileBuffer, {
+    const signedUrl = await getSignedUrlForFile(key, 3600, doConfig);
+    console.log("Generated signed URL:", signedUrl);
+
+    // Fetch the image
+    const imageResponse = await fetch(signedUrl);
+
+    if (!imageResponse.ok) {
+      throw new Error(
+        `Failed to fetch image from storage: ${imageResponse.status} for key ${key}`
+      );
+    }
+
+    // Get the image data as an array buffer
+    const imageBuffer = await imageResponse.arrayBuffer();
+
+    // Return the image with proper headers
+    return new NextResponse(imageBuffer, {
+      status: 200,
       headers: {
         "Content-Type": "image/png",
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": "public, max-age=86400", // Cache for 1 day
       },
     });
   } catch (error) {
+    console.error("Error proxying image:", error);
     return NextResponse.json(
       { error: `Failed to fetch image: ${(error as Error).message}` },
       { status: 500 }

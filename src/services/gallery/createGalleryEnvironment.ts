@@ -6,12 +6,10 @@ import {
   THREE_SCREEN_ANGLES,
 } from "./constants";
 import { createGalleryScreen } from "./createGalleryScreen";
-import { Scene } from "@/types/scene";
-import { Generation } from "@/types/generation";
+import { EnhancedScene } from "@arkology-studio/ontothesia-types/scene";
 
 export const createGalleryEnvironment = (
-  scenes: Scene[],
-  generations: Generation[]
+  scenes: EnhancedScene[]
 ): THREE.Group => {
   const group = new THREE.Group();
 
@@ -24,9 +22,7 @@ export const createGalleryEnvironment = (
     angles = THREE_SCREEN_ANGLES;
   }
 
-  const screens = scenes.map((scene) =>
-    createGalleryScreen(scene, generations)
-  );
+  const screens = scenes.map((scene) => createGalleryScreen(scene));
   screens.forEach((screen, i) => {
     if (i < angles.length) {
       const angleDeg = angles[i];

@@ -4,17 +4,18 @@ import React, { useEffect, useState } from "react";
 import Card from "@/components/Card";
 import Carousel from "@/components/Carousel";
 import Header from "@/components/Header";
-import { useGetExperiencesQuery, useGetGenerationsQuery } from "@/store/api";
+import { useGetExperiencesQuery } from "@/store/api";
 import { useRouter } from "next/navigation";
+import { Experience } from "@arkology-studio/ontothesia-types/experience";
 
-import { getExperienceGenerationsMap } from "@/services/utils/generations";
-import { getRandomImageUrls } from "@/services/utils/images";
-import { Experience } from "@prisma/client";
+interface EnhancedExperience extends Experience {
+  processedImageUrl: string;
+}
 
 export default function Gallery() {
-  const [visibleExperiences, setVisibleExperiences] = useState<Experience[]>(
-    []
-  );
+  const [visibleExperiences, setVisibleExperiences] = useState<
+    EnhancedExperience[]
+  >([]);
   const router = useRouter();
 
   const {
@@ -22,28 +23,40 @@ export default function Gallery() {
     isLoading: isLoadingExperiences,
     error: experiencesError,
   } = useGetExperiencesQuery();
-  const {
-    data: generations,
-    isLoading: isLoadingGenerations,
-    error: generationsError,
-  } = useGetGenerationsQuery();
 
-  const isLoading = isLoadingExperiences || isLoadingGenerations;
-  const error = experiencesError || generationsError;
+  const isLoading = isLoadingExperiences;
+  const error = experiencesError;
 
-  // Update visible experiences whenever the experiences data changes
+  // Update visible experiences and process image URLs whenever the experiences data changes
   useEffect(() => {
+    const processExperiences = async (exps: Experience[]) => {
+      const filtered = exps.filter((experience) => experience.visible);
+      const processed = await Promise.all(
+        filtered.map(async (exp) => {
+          // Get just the filename from the image_url
+          const filename = exp.image_url.split("/").pop();
+
+          console.log("Processing experience:", {
+            id: exp.id,
+            imageUrl: exp.image_url,
+            extractedFilename: filename,
+          });
+
+          // Construct the API route URL with folder parameter
+          const apiUrl = `/api/images/${filename}?folder=${process.env.NEXT_PUBLIC_EXPERIENCE_IMAGES_KEY}`;
+          return {
+            ...exp,
+            processedImageUrl: apiUrl,
+          };
+        })
+      );
+      setVisibleExperiences(processed);
+    };
+
     if (experiences) {
-      const filtered = experiences.filter((experience) => experience.visible);
-      setVisibleExperiences(filtered);
+      processExperiences(experiences);
     }
   }, [experiences]);
-
-  // Create a map of experience ID to its scene-specific generations
-  const experienceGenerations = React.useMemo(() => {
-    if (!generations || !experiences) return {};
-    return getExperienceGenerationsMap(generations, experiences);
-  }, [generations, experiences]);
 
   // Always maintain the same base layout structure
   return (
@@ -90,16 +103,19 @@ export default function Gallery() {
                 {visibleExperiences.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => router.push(`/gallery/${item.id}`)}
+                    onClick={() =>
+                      router.push(
+                        `/gallery/${item.id}?imageUrl=${encodeURIComponent(
+                          item.processedImageUrl
+                        )}`
+                      )
+                    }
                     className="cursor-pointer"
                   >
                     <Card
                       title={item.title}
                       description={item.description}
-                      imageUrls={getRandomImageUrls(
-                        experienceGenerations[item.id] || [],
-                        8
-                      )}
+                      imageUrl={item.processedImageUrl}
                       width="w-96"
                       height="h-96"
                     />
@@ -143,10 +159,7 @@ export default function Gallery() {
                     <Card
                       title={item.title}
                       description={item.description}
-                      imageUrls={getRandomImageUrls(
-                        experienceGenerations[item.id] || [],
-                        8
-                      )}
+                      imageUrl={item.processedImageUrl}
                       width="w-32"
                       height="h-48"
                     />

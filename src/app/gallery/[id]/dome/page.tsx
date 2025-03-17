@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
 import { useGetExperienceByIdQuery, useGetGenerationsQuery } from "@/store/api";
 import { useParams } from "next/navigation";
 import DomeScene from "@/components/Dome";
 import { useGetScenesQuery } from "@/store/api";
-import path from "path";
-import { Generation } from "@/types/generation";
-import { Scene } from "@/types/scene";
-import { ExperienceId } from "@/types/experience";
+
+import { Scene } from "@arkology-studio/ontothesia-types/scene";
+import { ExperienceId } from "@arkology-studio/ontothesia-types/experience";
+
+interface EnhancedScene extends Scene {
+  processedImageUrl: string;
+}
 
 export default function ExperiencePage() {
   const { id } = useParams() as { id: ExperienceId };
@@ -22,18 +25,73 @@ export default function ExperiencePage() {
   const allScenes = useGetScenesQuery();
   const allGenerations = useGetGenerationsQuery();
   const [experienceScenes, setExperienceScenes] = useState<Scene[]>([]);
+  const [isProcessing, setIsProcessing] = useState(true);
+  const [processedScenes, setProcessedScenes] = useState<EnhancedScene[]>([]);
+  const scenesToCleanupRef = useRef<EnhancedScene[]>([]);
 
   useEffect(() => {
     if (experience?.scenes && allScenes.data) {
-      // First, get all scenes for this experience
       const filteredScenes = allScenes.data.filter((scene) =>
         experience.scenes.some((expSceneId) => expSceneId === scene.id)
       );
-
       setExperienceScenes(filteredScenes);
-      console.log("Filtered scenes:", filteredScenes);
     }
   }, [experience?.scenes, allScenes.data]);
+
+  useEffect(() => {
+    const processSceneImages = async () => {
+      setIsProcessing(true);
+      try {
+        const processed = await Promise.all(
+          experienceScenes.map(async (scene) => {
+            const filename = scene.image_url.split("/").pop();
+            const apiUrl = `/api/images/${filename}?folder=${process.env.NEXT_PUBLIC_SCENE_IMAGES_KEY}`;
+
+            try {
+              const response = await fetch(apiUrl);
+              if (!response.ok) {
+                console.error(`Failed to fetch image for scene ${scene.id}`);
+                return {
+                  ...scene,
+                  processedImageUrl: apiUrl,
+                };
+              }
+
+              const blob = await response.blob();
+              const objectUrl = URL.createObjectURL(blob);
+
+              return {
+                ...scene,
+                processedImageUrl: objectUrl,
+              };
+            } catch (error) {
+              console.error(`Error processing scene ${scene.id}:`, error);
+              return {
+                ...scene,
+                processedImageUrl: apiUrl,
+              };
+            }
+          })
+        );
+        scenesToCleanupRef.current = processed;
+        setProcessedScenes(processed);
+      } finally {
+        setIsProcessing(false);
+      }
+    };
+
+    if (experienceScenes.length > 0) {
+      processSceneImages();
+    }
+
+    return () => {
+      scenesToCleanupRef.current.forEach((scene) => {
+        if (scene.processedImageUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(scene.processedImageUrl);
+        }
+      });
+    };
+  }, [experienceScenes]);
 
   if (!allGenerations.data || allGenerations.isLoading) {
     return (
@@ -50,21 +108,7 @@ export default function ExperiencePage() {
     );
   }
 
-  let processedGenerations: Generation[] = [];
-  if (!process.env.NEXT_PUBLIC_GENERATIONS_DIR) {
-    throw new Error("NEXT_PUBLIC_GENERATIONS_DIR is not set");
-  } else {
-    processedGenerations = allGenerations.data.map((generation) => ({
-      ...generation,
-      image_url: path.join(
-        process.env.NEXT_PUBLIC_GENERATIONS_DIR || "",
-        generation.image_url
-      ),
-    }));
-  }
-
   console.log("All scenes", allScenes.data);
-  console.log("All generations", processedGenerations);
 
   if (!allScenes.data) {
     return <div>No scenes or experiences found</div>;
@@ -118,10 +162,11 @@ export default function ExperiencePage() {
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex flex-col items-center gap-8">
-          <DomeScene
-            scenes={experienceScenes}
-            generations={processedGenerations}
-          />
+          {isProcessing ? (
+            <div className="text-2xl">Processing images...</div>
+          ) : (
+            <DomeScene scenes={processedScenes} />
+          )}
         </div>
       </main>
     </div>

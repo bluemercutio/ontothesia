@@ -7,7 +7,7 @@ import {
 } from "../services/graph/interface";
 import { NetworkOverlay } from "./NetworkOverlay";
 
-import { Artefact } from "@/types/artefact";
+import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 
 type SimNode = d3.SimulationNodeDatum & GraphNode;
 type SimLink = d3.SimulationLinkDatum<SimNode> & GraphEdge;

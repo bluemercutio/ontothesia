@@ -1,18 +1,12 @@
 import * as THREE from "three";
-import { Scene } from "@/types/scene";
-import { Generation } from "@/types/generation";
+import { EnhancedScene } from "@arkology-studio/ontothesia-types/scene";
 import { vertexShader, fragmentShader } from "./shaders";
-import {
-  findGenerationForScene,
-  getImageUrlForGeneration,
-} from "../utils/generations";
 
 export const createScreen = (
   position: THREE.Vector3,
   width: number,
   height: number,
-  scene: Scene,
-  generations: Generation[],
+  scene: EnhancedScene,
   schedulingUniforms: {
     offset: number;
     cycleDuration: number;
@@ -23,18 +17,20 @@ export const createScreen = (
   const geometry = new THREE.PlaneGeometry(width, height);
   let texture: THREE.Texture = new THREE.Texture(); // fallback texture
 
-  if (scene) {
-    const generation = findGenerationForScene(scene, generations);
-    if (generation) {
-      texture = new THREE.TextureLoader().load(
-        getImageUrlForGeneration(generation),
-        undefined,
-        undefined,
-        (error) => {
-          console.warn("Error loading texture:", error);
-        }
-      );
-    }
+  if (scene && scene.processedImageUrl) {
+    texture = new THREE.TextureLoader().load(
+      scene.processedImageUrl,
+      (loadedTexture) => {
+        loadedTexture.minFilter = THREE.LinearFilter;
+        loadedTexture.magFilter = THREE.LinearFilter;
+        loadedTexture.format = THREE.RGBAFormat;
+        loadedTexture.needsUpdate = true;
+      },
+      undefined,
+      (error) => {
+        console.warn("Error loading texture:", error);
+      }
+    );
   }
 
   const material = new THREE.ShaderMaterial({

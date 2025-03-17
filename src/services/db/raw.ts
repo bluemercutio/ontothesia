@@ -1,0 +1,61 @@
+export type RawArtefactWithEmbedding = {
+  id: string;
+  title: string;
+  text: string;
+  region: string;
+  approx_date: string;
+  citation: string;
+  embedding: {
+    id: string;
+    text: string;
+    vector: number[];
+    artefactId: string;
+  } | null;
+};
+
+export type RawSceneWithGeneration = {
+  id: string;
+  title: string;
+  context: string;
+  artefactId: string;
+  image_url: string;
+  video_url: string | null;
+  visualisation: string;
+  experienceId: string | null;
+  generation: {
+    id: string;
+    prompt: string;
+    image_url: string;
+    artefactId: string;
+    sceneId: string;
+  } | null;
+};
+
+export type RawExperienceWithScenes = {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  visible: boolean;
+  scenes: Array<{
+    id: string;
+    title: string;
+    context: string;
+    // etc. or just 'id'
+  }>;
+};
+
+export type RawEmbedding = {
+  id: string;
+  text: string;
+  vector: number[];
+  artefactId: string;
+};
+
+export type RawGeneration = {
+  id: string;
+  prompt: string;
+  image_url: string;
+  artefactId: string;
+  sceneId: string;
+};

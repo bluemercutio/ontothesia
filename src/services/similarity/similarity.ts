@@ -1,4 +1,4 @@
-import { Embedding } from "@/types/embedding";
+import { Embedding } from "@arkology-studio/ontothesia-types/embedding";
 
 /**
  * Calculates the cosine similarity between two numerical vectors.

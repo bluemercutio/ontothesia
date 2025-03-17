@@ -12,7 +12,7 @@ import {
 import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
 import Link from "next/link";
 import { GraphNode } from "@/services/graph/interface";
-import { Artefact } from "@/types/artefact";
+import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 export default function ArtefactPage() {
   const params = useParams();
   const id = params?.id;

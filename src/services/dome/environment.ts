@@ -7,22 +7,20 @@ import {
   FADE_DURATION,
   OFFSET_INCREMENT,
 } from "./constants";
-import { Scene } from "@/types/scene";
-import { Generation } from "@/types/generation";
+import { EnhancedScene } from "@arkology-studio/ontothesia-types/scene";
 import { createScreen } from "./createScreen";
 
 export function createDomeEnvironment(
   radius: number,
-  scenes: Scene[],
-  generations: Generation[]
+  scenes: EnhancedScene[]
 ): THREE.Group {
   const group = new THREE.Group();
 
   // Generate dome screens
-  let screens = generateDomeScreens(radius, scenes, generations);
+  let screens = generateDomeScreens(radius, scenes);
 
   // Ensure first screen is directly in front of the user
-  const frontScreen = createFrontScreen(radius, scenes[0], generations);
+  const frontScreen = createFrontScreen(radius, scenes[0]);
 
   // Remove the front screen from shuffled array to avoid duplication
   screens = screens.filter((s) => s !== frontScreen);
@@ -49,17 +47,13 @@ export function createDomeEnvironment(
   return group;
 }
 
-/**
- * Creates the first screen directly in front of the user.
- */
 export function createFrontScreen(
   radius: number,
-  scene: Scene,
-  generations: Generation[]
+  scene: EnhancedScene
 ): THREE.Mesh {
-  const position = new THREE.Vector3(0, 0, -radius); // Directly in front (negative Z-axis)
+  const position = new THREE.Vector3(0, 0, -radius);
   const schedulingUniforms = {
-    offset: 0, // First screen to appear
+    offset: 0,
     cycleDuration: CYCLE_DURATION,
     fadeDuration: FADE_DURATION,
     visibleDuration: VISIBLE_DURATION,
@@ -69,18 +63,13 @@ export function createFrontScreen(
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
     scene,
-    generations,
     schedulingUniforms
   );
 }
 
-/**
- * Generates screens positioned in the upper 180-degree hemisphere of the dome.
- */
 export function generateDomeScreens(
   radius: number,
-  scenes: Scene[],
-  generations: Generation[]
+  scenes: EnhancedScene[]
 ): THREE.Mesh[] {
   const screens: THREE.Mesh[] = [];
 
@@ -104,14 +93,13 @@ export function generateDomeScreens(
       SCREEN_WIDTH,
       SCREEN_HEIGHT,
       sceneItem,
-      generations,
       schedulingUniforms
     );
     screens.push(screen);
   }
 
   // 3 Angled Screens Above Viewer
-  const tiltAngle = Math.PI / 4; // 45 degrees upwards
+  const tiltAngle = Math.PI / 4;
   const y = radius * Math.sin(tiltAngle);
   const horizontalRadius = radius * Math.cos(tiltAngle);
 
@@ -134,7 +122,6 @@ export function generateDomeScreens(
       SCREEN_WIDTH,
       SCREEN_HEIGHT,
       sceneItem,
-      generations,
       schedulingUniforms
     );
     screens.push(screen);
@@ -155,7 +142,6 @@ export function generateDomeScreens(
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
     sceneItem,
-    generations,
     schedulingUniforms
   );
   screens.push(zenithScreen);
@@ -163,9 +149,6 @@ export function generateDomeScreens(
   return screens;
 }
 
-/**
- * Utility function to shuffle an array (Fisher-Yates shuffle).
- */
 const shuffleArray = <T>(array: T[]): void => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { GraphNode } from "../services/graph/interface";
-import { Artefact } from "../types/artefact";
+import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 
 interface NetworkOverlayProps {
   selectedNode: GraphNode | null;
