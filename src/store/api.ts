@@ -6,7 +6,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Generation } from "@arkology-studio/ontothesia-types/generation";
 
 // Update the BASE_URL to include the full URL
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api"; // Adjust port if different
+const BASE_URL = window.location.origin + "/api"; // Adjust port if different
 
 export const api = createApi({
   reducerPath: "api",
