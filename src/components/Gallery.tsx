@@ -45,7 +45,6 @@ const Gallery: React.FC<GalleryProps> = ({
   const mouse = useRef(new THREE.Vector2()).current;
   const creationCount = useRef(0);
   const [processedScenes, setProcessedScenes] = useState<EnhancedScene[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const onClick = useCallback(
     (event: MouseEvent): void => {
@@ -97,7 +96,7 @@ const Gallery: React.FC<GalleryProps> = ({
   // Update the useEffect that processes images
   useEffect(() => {
     const processSceneImages = async () => {
-      setIsLoading(true);
+      // setIsLoading(true);
       try {
         const processed = await Promise.all(
           scenes.map(async (scene) => {
@@ -131,8 +130,8 @@ const Gallery: React.FC<GalleryProps> = ({
           })
         );
         setProcessedScenes(processed);
-      } finally {
-        setIsLoading(false);
+      } catch (error) {
+        console.error(`Error processing scenes:`, error);
       }
     };
 
@@ -293,15 +292,6 @@ const Gallery: React.FC<GalleryProps> = ({
     currentNodeId,
     fullNetwork,
   ]);
-
-  // Update the return statement to show loading state
-  if (isLoading) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <div className="text-2xl">Loading Experience...</div>
-      </div>
-    );
-  }
 
   return <div ref={mountRef} className="w-full h-screen cursor-pointer" />;
 };
