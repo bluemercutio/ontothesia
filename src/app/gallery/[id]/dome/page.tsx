@@ -7,7 +7,7 @@ import { useGetExperienceByIdQuery, useGetGenerationsQuery } from "@/store/api";
 import { useParams } from "next/navigation";
 import DomeScene from "@/components/Dome";
 import { useGetScenesQuery } from "@/store/api";
-
+import { LoadingState } from "@/components/LoadingSpinner";
 import { Scene } from "@arkology-studio/ontothesia-types/scene";
 import { ExperienceId } from "@arkology-studio/ontothesia-types/experience";
 
@@ -94,18 +94,7 @@ export default function ExperiencePage() {
   }, [experienceScenes]);
 
   if (!allGenerations.data || allGenerations.isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header title="Loading..." />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-full">
-            <div className="animate-pulse space-y-8 w-full max-w-2xl">
-              <div className="h-64 bg-gray-200 rounded-lg"></div>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   console.log("All scenes", allScenes.data);
@@ -123,20 +112,7 @@ export default function ExperiencePage() {
   }
 
   if (isLoadingExperience) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header title="Loading..." />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-full">
-            <div className="animate-pulse space-y-8 w-full max-w-2xl">
-              <div className="h-64 bg-gray-200 rounded-lg"></div>
-              <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-32 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (errorExperience || !experience) {
@@ -163,7 +139,7 @@ export default function ExperiencePage() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex flex-col items-center gap-8">
           {isProcessing ? (
-            <div className="text-2xl">Processing images...</div>
+            <LoadingState />
           ) : (
             <DomeScene scenes={processedScenes} />
           )}

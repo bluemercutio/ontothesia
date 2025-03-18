@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, JSX, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Gallery from "@/components/Gallery";
 import {
   useGetEmbeddingsQuery,
@@ -14,21 +14,12 @@ import dynamic from "next/dynamic";
 import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
 import { EmbeddingId } from "@arkology-studio/ontothesia-types/embedding";
 import { Scene } from "@arkology-studio/ontothesia-types/scene";
+import { LoadingState } from "@/components/LoadingSpinner";
 const MapButton = dynamic(() => import("@/components/MapButton"), {
   ssr: false,
 });
 
-function LoadingState(): JSX.Element {
-  return (
-    <div className="w-full h-screen flex justify-center items-center">
-      <div className="animate-pulse space-y-8 w-full max-w-2xl">
-        <div className="h-64 bg-gray-200 rounded-lg"></div>
-      </div>
-    </div>
-  );
-}
-
-export default function GalleryRoom(): JSX.Element {
+export default function GalleryRoom(): React.ReactElement {
   const { id } = useParams() as { id: string };
   const { data: experience } = useGetExperienceByIdQuery(id);
   const { data: embeddings, isLoading: embeddingsLoading } =
@@ -41,66 +32,91 @@ export default function GalleryRoom(): JSX.Element {
   const [currentNodeId, setCurrentNodeId] = useState<EmbeddingId | null>(null);
   const [isMapVisible, setIsMapVisible] = useState(true);
   const [experienceScenes, setExperienceScenes] = useState<Scene[]>([]);
+  const [firstNodeSelected, setFirstNodeSelected] = useState(false);
+
   const timeoutRef = useRef<number | undefined>(undefined);
 
   const resetTimer = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
+    setIsMapVisible(true);
     timeoutRef.current = window.setTimeout(() => {
       setIsMapVisible(false);
-    }, 3000);
+    }, 2000);
   }, []);
 
   useEffect(() => {
     resetTimer();
+    const handleMouseMove = () => {
+      resetTimer();
+    };
+    window.addEventListener("mousemove", handleMouseMove);
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, [resetTimer]);
 
   useEffect(() => {
-    if (embeddings && artefacts && experience && scenes) {
-      // First, get all scenes for this experience
+    if (embeddings && artefacts && experience && scenes && !firstNodeSelected) {
       const filteredScenes = scenes.filter((scene) =>
-        experience.scenes.some((expSceneId) => expSceneId === scene.id)
+        experience.scenes.includes(scene.id)
       );
 
-      // Get artefacts for these filtered scenes
       const relevantArtefacts = artefacts.filter((artefact) =>
         filteredScenes.some((scene) => scene.artefact === artefact.id)
       );
-      console.log("Relevant artefacts:", relevantArtefacts);
 
-      // Get embeddings for these artefacts
       const relevantEmbeddings = embeddings.filter((embedding) =>
         relevantArtefacts.some(
           (artefact) => artefact.embedding === embedding.id
         )
       );
-      console.log("Relevant embeddings:", relevantEmbeddings);
 
-      // Update state
-      setExperienceScenes(filteredScenes);
-
-      if (relevantEmbeddings.length > 0) {
-        const randomIndex = Math.floor(
-          Math.random() * relevantEmbeddings.length
-        );
-        const chosenEmbedding = relevantEmbeddings[randomIndex];
-        setCurrentNodeId(chosenEmbedding.id);
-        const network = buildDirectedNetwork(
-          chosenEmbedding,
+      // Find a candidate node that has at least 3 outgoing edges
+      const candidates = relevantEmbeddings.filter((embedding) => {
+        const testNetwork = buildDirectedNetwork(
+          embedding,
           relevantEmbeddings,
           3,
           0.8
         );
-        setFullNetwork(network);
+
+        // Count outgoing edges
+        const outgoingEdges = testNetwork.edges.filter(
+          (edge) => edge.source === embedding.id
+        ).length;
+
+        return outgoingEdges >= 3;
+      });
+
+      let chosenEmbedding;
+      if (candidates.length > 0) {
+        chosenEmbedding =
+          candidates[Math.floor(Math.random() * candidates.length)];
+      } else {
+        chosenEmbedding =
+          relevantEmbeddings[
+            Math.floor(Math.random() * relevantEmbeddings.length)
+          ];
       }
+
+      setCurrentNodeId(chosenEmbedding.id);
+      const network = buildDirectedNetwork(
+        chosenEmbedding,
+        relevantEmbeddings,
+        3,
+        0.8
+      );
+      setFullNetwork(network);
+
+      setFirstNodeSelected(true);
+      setExperienceScenes(filteredScenes);
     }
-  }, [embeddings, artefacts, experience, scenes]); // Remove experienceScenes from dependencies
+  }, [embeddings, artefacts, experience, scenes, firstNodeSelected]);
 
   const handleNodeChange = useCallback((node: GraphNode): void => {
     setCurrentNodeId(node.id);
@@ -119,6 +135,7 @@ export default function GalleryRoom(): JSX.Element {
   ) {
     return <LoadingState />;
   }
+
   const artefact = artefacts.find((a) => a.embedding === currentNodeId);
   if (!artefact) {
     console.error("No artefact found for current node id", currentNodeId);
