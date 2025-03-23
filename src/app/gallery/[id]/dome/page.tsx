@@ -28,6 +28,25 @@ export default function ExperiencePage() {
   const [isProcessing, setIsProcessing] = useState(true);
   const [processedScenes, setProcessedScenes] = useState<EnhancedScene[]>([]);
   const scenesToCleanupRef = useRef<EnhancedScene[]>([]);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [instructionsOpacity, setInstructionsOpacity] = useState(1);
+
+  useEffect(() => {
+    const handleClick = () => {
+      setInstructionsOpacity(0);
+      setTimeout(() => {
+        setShowInstructions(false);
+      }, 1500);
+    };
+
+    if (showInstructions) {
+      document.addEventListener("click", handleClick);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [showInstructions]);
 
   useEffect(() => {
     if (experience?.scenes && allScenes.data) {
@@ -136,8 +155,18 @@ export default function ExperiencePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 relative">
         <div className="flex flex-col items-center gap-8">
+          {showInstructions && (
+            <div
+              className="absolute top-8 left-0 right-0 z-10 text-center transition-opacity duration-1500"
+              style={{ pointerEvents: "none", opacity: instructionsOpacity }}
+            >
+              <p className="text-lg md:text-xl text-white drop-shadow-md">
+                Click to Active Camera Controls
+              </p>
+            </div>
+          )}
           {isProcessing ? (
             <LoadingState />
           ) : (

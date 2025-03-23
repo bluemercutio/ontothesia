@@ -18,6 +18,12 @@ import { LoadingState } from "@/components/LoadingSpinner";
 const MapButton = dynamic(() => import("@/components/MapButton"), {
   ssr: false,
 });
+const ArtefactTextButton = dynamic(
+  () => import("@/components/ArtefactTextButton"),
+  {
+    ssr: false,
+  }
+);
 
 export default function GalleryRoom(): React.ReactElement {
   const { id } = useParams() as { id: string };
@@ -33,6 +39,8 @@ export default function GalleryRoom(): React.ReactElement {
   const [isMapVisible, setIsMapVisible] = useState(true);
   const [experienceScenes, setExperienceScenes] = useState<Scene[]>([]);
   const [firstNodeSelected, setFirstNodeSelected] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [instructionsOpacity, setInstructionsOpacity] = useState(1);
 
   const timeoutRef = useRef<number | undefined>(undefined);
 
@@ -122,6 +130,24 @@ export default function GalleryRoom(): React.ReactElement {
     setCurrentNodeId(node.id);
   }, []);
 
+  // Modified click event listener to fade out instructions
+  useEffect(() => {
+    const handleClick = () => {
+      setInstructionsOpacity(0);
+      setTimeout(() => {
+        setShowInstructions(false);
+      }, 1500); // Wait for fade out animation to complete
+    };
+
+    if (showInstructions) {
+      document.addEventListener("click", handleClick);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [showInstructions]);
+
   if (
     embeddingsLoading ||
     scenesLoading ||
@@ -144,7 +170,17 @@ export default function GalleryRoom(): React.ReactElement {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1">
+      <main className="flex-1 relative">
+        {showInstructions && (
+          <div
+            className="absolute top-8 left-0 right-0 z-10 text-center transition-opacity duration-1500"
+            style={{ pointerEvents: "none", opacity: instructionsOpacity }}
+          >
+            <p className="text-lg md:text-xl text-white drop-shadow-md">
+              Click an image to move through the network of artefacts
+            </p>
+          </div>
+        )}
         <Gallery
           fullNetwork={fullNetwork}
           currentNodeId={currentNodeId}
@@ -153,6 +189,8 @@ export default function GalleryRoom(): React.ReactElement {
           scenes={experienceScenes}
           onNodeChange={handleNodeChange}
         />
+        <ArtefactTextButton isVisible={isMapVisible} artefact={artefact} />
+
         <MapButton
           isVisible={isMapVisible}
           data={fullNetwork}
