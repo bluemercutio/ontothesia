@@ -6,6 +6,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import NavigationButton from "@/components/NavigationButton";
+import { MobileDetection } from "@/components/MobileDetection";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,9 +42,12 @@ export default function RootLayout({
     >
       <body>
         <Providers>
-          <NavbarWrapper />
-          {children}
-          <NavigationButton />
+          <MobileDetection
+            navbar={<NavbarWrapper />}
+            navigationButton={<NavigationButton />}
+          >
+            {children}
+          </MobileDetection>
         </Providers>
       </body>
     </html>
