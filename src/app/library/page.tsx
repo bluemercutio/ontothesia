@@ -6,13 +6,14 @@ import Card from "@/components/Card";
 import { useGetArtefactsQuery } from "@/store/api";
 import PageInstruction from "@/components/PageInstruction";
 import Artefact from "@/components/Artefact";
+import { LoadingState } from "@/components/LoadingSpinner";
 
 export default function Library() {
   const router = useRouter();
 
   const { data: artefacts, isLoading, error } = useGetArtefactsQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingState />;
   if (error) return <div>Error loading artefacts</div>;
   if (!artefacts) return <div>No artefacts found</div>;
 
