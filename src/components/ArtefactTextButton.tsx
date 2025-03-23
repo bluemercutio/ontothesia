@@ -101,6 +101,22 @@ const ArtefactTextButton: React.FC<ArtefactTextButtonProps> = ({
             </p>
             <br />
             <p style={{ color: "#fff", lineHeight: "1.6" }}>{artefact.text}</p>
+
+            <div style={{ marginTop: "20px" }}>
+              <a
+                href={`/library/${artefact.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: "#aaa",
+                  textDecoration: "none",
+                  display: "inline-block",
+                  marginTop: "10px",
+                }}
+              >
+                View in Library
+              </a>
+            </div>
           </div>
         )}
       </TextContainer>

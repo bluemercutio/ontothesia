@@ -13,6 +13,8 @@ import { buildDirectedNetwork } from "@/services/graph/similarity-graph";
 import Link from "next/link";
 import { GraphNode } from "@/services/graph/interface";
 import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
+import { LoadingState } from "@/components/LoadingSpinner";
+
 export default function ArtefactPage() {
   const params = useParams();
   const id = params?.id;
@@ -80,11 +82,7 @@ export default function ArtefactPage() {
     artefactLoading || embeddingsLoading || scenesLoading || artefactsLoading;
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Loading artefact...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (artefactError || !artefact || !selectedArtefact) {

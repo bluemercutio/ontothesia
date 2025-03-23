@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "@/components/Card";
 import Carousel from "@/components/Carousel";
-import Header from "@/components/Header";
+import PageInstruction from "@/components/PageInstruction";
 import { useGetExperiencesQuery } from "@/store/api";
 import { useRouter } from "next/navigation";
 import { Experience } from "@arkology-studio/ontothesia-types/experience";
@@ -61,7 +61,6 @@ export default function Gallery() {
   // Always maintain the same base layout structure
   return (
     <div className="min-h-screen flex flex-col">
-      <Header title="Gallery" />
       <main className="flex-1 container mx-auto px-4">
         {isLoading ? (
           // Loading state that matches the layout
@@ -98,6 +97,7 @@ export default function Gallery() {
         ) : visibleExperiences.length > 0 ? (
           // Content when data is available
           <>
+            <PageInstruction text="Select an Experience to view" />
             <div className="h-[calc(100vh-theme(spacing.16))] flex flex-col items-center justify-center">
               <Carousel>
                 {visibleExperiences.map((item) => (

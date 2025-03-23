@@ -4,7 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/Card";
 import { useGetArtefactsQuery } from "@/store/api";
-
+import PageInstruction from "@/components/PageInstruction";
 import Artefact from "@/components/Artefact";
 
 export default function Library() {
@@ -20,9 +20,7 @@ export default function Library() {
     <div className="min-h-screen flex flex-col">
       {/* <Header title="Library" /> */}
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="text-2xl font-bold py-16 text-center">
-          Select an Artefact to view
-        </div>
+        <PageInstruction text="Select an Artefact to view" />
 
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

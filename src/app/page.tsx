@@ -36,7 +36,7 @@ export default function Home() {
         {isMobile && (
           <div
             className={`text-center text-sm mt-8 max-w-xs px-4 transition-opacity duration-1000 ease-in-out ${
-              showMobileMessage ? "opacity-70" : "opacity-0"
+              showMobileMessage ? "opacity-100" : "opacity-0"
             }`}
           >
             This experience is optimized for desktop viewing. Mobile support is
