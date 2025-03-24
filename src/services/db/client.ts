@@ -15,7 +15,6 @@ import {
   Embedding,
   EmbeddingId,
 } from "@arkology-studio/ontothesia-types/embedding";
-import { Generation } from "@arkology-studio/ontothesia-types/generation";
 import { v4 as uuidv4 } from "uuid";
 
 import {
@@ -23,7 +22,6 @@ import {
   RawSceneWithGeneration,
   RawExperienceWithScenes,
   RawEmbedding,
-  RawGeneration,
 } from "./raw"; // <-- adjust path as needed
 
 // ───────────────────────────────────────────────────────────────────
@@ -52,7 +50,6 @@ function mapScene(raw: RawSceneWithGeneration): Scene {
     video_url: raw.video_url ?? "",
     visualisation: raw.visualisation,
     experience: raw.experienceId ?? "",
-    generation: raw.generation?.id ?? "",
   };
 }
 
@@ -72,16 +69,6 @@ function mapEmbedding(raw: RawEmbedding): Embedding {
     id: raw.id,
     vector: raw.vector,
     artefactId: raw.artefactId,
-  };
-}
-
-function mapGeneration(raw: RawGeneration): Generation {
-  return {
-    id: raw.id,
-    prompt: raw.prompt,
-    image_url: raw.image_url,
-    artefact: raw.artefactId,
-    scene: raw.sceneId,
   };
 }
 
@@ -153,7 +140,7 @@ export const dbService: DBService = {
     const {
       artefact: artefactId,
       experience: experienceId,
-      generation,
+
       ...rest
     } = data;
     const created = await prisma.scene.create({
@@ -161,7 +148,6 @@ export const dbService: DBService = {
         ...rest,
         artefactId,
         experienceId,
-        generation: { connect: { id: generation } },
       },
       include: { generation: true },
     });
@@ -184,19 +170,13 @@ export const dbService: DBService = {
   },
 
   updateScene: async (id: SceneId, data: Partial<Scene>): Promise<Scene> => {
-    const {
-      artefact: artefactId,
-      experience: experienceId,
-      generation,
-      ...rest
-    } = data;
+    const { artefact: artefactId, experience: experienceId, ...rest } = data;
     const updated = await prisma.scene.update({
       where: { id },
       data: {
         ...rest,
         ...(artefactId && { artefactId }),
         ...(experienceId && { experienceId }),
-        ...(generation && { generation: { connect: { id: generation } } }),
       },
       include: { generation: true },
     });
@@ -303,28 +283,5 @@ export const dbService: DBService = {
       where: { artefactId },
     });
     return embedding ? mapEmbedding(embedding) : null;
-  },
-
-  // ───────────────────────────────────────────────────────────────────
-  // GENERATION
-  // ───────────────────────────────────────────────────────────────────
-  createGeneration: async (
-    data: Omit<Generation, "id">
-  ): Promise<Generation> => {
-    const created = await prisma.generation.create({
-      data: {
-        id: uuidv4(),
-        image_url: data.image_url,
-        prompt: data.prompt,
-        artefactId: data.artefact,
-        sceneId: data.scene,
-      },
-    });
-    return mapGeneration(created);
-  },
-
-  getAllGenerations: async (): Promise<Generation[]> => {
-    const generations = await prisma.generation.findMany();
-    return generations.map(mapGeneration);
   },
 };
