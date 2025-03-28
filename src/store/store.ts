@@ -15,7 +15,6 @@ store.dispatch(api.endpoints.getExperiences.initiate());
 store.dispatch(api.endpoints.getScenes.initiate());
 store.dispatch(api.endpoints.getArtefacts.initiate());
 store.dispatch(api.endpoints.getEmbeddings.initiate());
-store.dispatch(api.endpoints.getGenerations.initiate());
 
 // Prefetch individual experiences (we can get the IDs from the experiences list)
 store.dispatch(api.endpoints.getExperiences.initiate()).then((result) => {

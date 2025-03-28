@@ -2,7 +2,7 @@
 
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Card from "@/components/Card";
-import { useGetExperienceByIdQuery, useGetGenerationsQuery } from "@/store/api";
+import { useGetExperienceByIdQuery } from "@/store/api";
 
 export default function GalleryOptions() {
   const { id } = useParams() as { id: string };
@@ -21,21 +21,8 @@ export default function GalleryOptions() {
     isLoading: isLoadingExperience,
     error: errorExperience,
   } = useGetExperienceByIdQuery(id);
-  const {
-    data: generations,
-    isLoading: isLoadingGenerations,
-    error: errorGenerations,
-  } = useGetGenerationsQuery();
 
-  if (
-    isLoadingExperience ||
-    errorExperience ||
-    !experience ||
-    !generations ||
-    isLoadingGenerations ||
-    errorGenerations
-  )
-    return null;
+  if (isLoadingExperience || errorExperience || !experience) return null;
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -3,7 +3,6 @@ import { Scene } from "@arkology-studio/ontothesia-types/scene";
 import { Artefact } from "@arkology-studio/ontothesia-types/artefact";
 import { Embedding } from "@arkology-studio/ontothesia-types/embedding";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Generation } from "@arkology-studio/ontothesia-types/generation";
 
 // Determine API base URL dynamically based on environment
 const BASE_URL =
@@ -23,7 +22,7 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Experience", "Scene", "Artefact", "Embedding", "Generation"],
+  tagTypes: ["Experience", "Scene", "Artefact", "Embedding"],
   keepUnusedDataFor: 3600, // Keep unused data in cache for 1 hour
   endpoints: (builder) => ({
     // ───────────────────────────────────────────────────────────────────
@@ -77,14 +76,6 @@ export const api = createApi({
       query: () => "/embeddings",
       providesTags: ["Embedding"],
     }),
-
-    // ───────────────────────────────────────────────────────────────────
-    // GENERATIONS
-    // ───────────────────────────────────────────────────────────────────
-    getGenerations: builder.query<Generation[], void>({
-      query: () => "/generations",
-      providesTags: ["Generation"],
-    }),
   }),
 });
 
@@ -98,5 +89,4 @@ export const {
   useGetArtefactsQuery,
   useGetArtefactByIdQuery,
   useGetEmbeddingsQuery,
-  useGetGenerationsQuery,
 } = api;

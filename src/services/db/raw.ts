@@ -13,7 +13,7 @@ export type RawArtefactWithEmbedding = {
   } | null;
 };
 
-export type RawSceneWithGeneration = {
+export type RawScene = {
   id: string;
   title: string;
   context: string;
@@ -22,13 +22,6 @@ export type RawSceneWithGeneration = {
   video_url: string | null;
   visualisation: string;
   experienceId: string | null;
-  generation: {
-    id: string;
-    prompt: string;
-    image_url: string;
-    artefactId: string;
-    sceneId: string;
-  } | null;
 };
 
 export type RawExperienceWithScenes = {
@@ -50,12 +43,4 @@ export type RawEmbedding = {
   text: string;
   vector: number[];
   artefactId: string;
-};
-
-export type RawGeneration = {
-  id: string;
-  prompt: string;
-  image_url: string;
-  artefactId: string;
-  sceneId: string;
 };

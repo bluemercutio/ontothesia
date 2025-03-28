@@ -15,15 +15,13 @@ import {
   Embedding,
   EmbeddingId,
 } from "@arkology-studio/ontothesia-types/embedding";
-import { Generation } from "@arkology-studio/ontothesia-types/generation";
 import { v4 as uuidv4 } from "uuid";
 
 import {
   RawArtefactWithEmbedding,
-  RawSceneWithGeneration,
   RawExperienceWithScenes,
+  RawScene,
   RawEmbedding,
-  RawGeneration,
 } from "./raw"; // <-- adjust path as needed
 
 // ───────────────────────────────────────────────────────────────────
@@ -42,7 +40,7 @@ function mapArtefact(raw: RawArtefactWithEmbedding): Artefact {
   };
 }
 
-function mapScene(raw: RawSceneWithGeneration): Scene {
+function mapScene(raw: RawScene): Scene {
   return {
     id: raw.id,
     title: raw.title,
@@ -52,7 +50,6 @@ function mapScene(raw: RawSceneWithGeneration): Scene {
     video_url: raw.video_url ?? "",
     visualisation: raw.visualisation,
     experience: raw.experienceId ?? "",
-    generation: raw.generation?.id ?? "",
   };
 }
 
@@ -72,16 +69,6 @@ function mapEmbedding(raw: RawEmbedding): Embedding {
     id: raw.id,
     vector: raw.vector,
     artefactId: raw.artefactId,
-  };
-}
-
-function mapGeneration(raw: RawGeneration): Generation {
-  return {
-    id: raw.id,
-    prompt: raw.prompt,
-    image_url: raw.image_url,
-    artefact: raw.artefactId,
-    scene: raw.sceneId,
   };
 }
 
@@ -153,7 +140,7 @@ export const dbService: DBService = {
     const {
       artefact: artefactId,
       experience: experienceId,
-      generation,
+
       ...rest
     } = data;
     const created = await prisma.scene.create({
@@ -161,9 +148,7 @@ export const dbService: DBService = {
         ...rest,
         artefactId,
         experienceId,
-        generation: { connect: { id: generation } },
       },
-      include: { generation: true },
     });
     return mapScene(created);
   },
@@ -171,34 +156,24 @@ export const dbService: DBService = {
   getSceneById: async (id: SceneId): Promise<Scene | null> => {
     const scene = await prisma.scene.findUnique({
       where: { id },
-      include: { generation: true },
     });
     return scene ? mapScene(scene) : null;
   },
 
   getAllScenes: async (): Promise<Scene[]> => {
-    const scenes = await prisma.scene.findMany({
-      include: { generation: true },
-    });
+    const scenes = await prisma.scene.findMany({});
     return scenes.map(mapScene);
   },
 
   updateScene: async (id: SceneId, data: Partial<Scene>): Promise<Scene> => {
-    const {
-      artefact: artefactId,
-      experience: experienceId,
-      generation,
-      ...rest
-    } = data;
+    const { artefact: artefactId, experience: experienceId, ...rest } = data;
     const updated = await prisma.scene.update({
       where: { id },
       data: {
         ...rest,
         ...(artefactId && { artefactId }),
         ...(experienceId && { experienceId }),
-        ...(generation && { generation: { connect: { id: generation } } }),
       },
-      include: { generation: true },
     });
     return mapScene(updated);
   },
@@ -206,7 +181,6 @@ export const dbService: DBService = {
   deleteScene: async (id: SceneId): Promise<Scene> => {
     const deleted = await prisma.scene.delete({
       where: { id },
-      include: { generation: true },
     });
     return mapScene(deleted);
   },
@@ -303,28 +277,5 @@ export const dbService: DBService = {
       where: { artefactId },
     });
     return embedding ? mapEmbedding(embedding) : null;
-  },
-
-  // ───────────────────────────────────────────────────────────────────
-  // GENERATION
-  // ───────────────────────────────────────────────────────────────────
-  createGeneration: async (
-    data: Omit<Generation, "id">
-  ): Promise<Generation> => {
-    const created = await prisma.generation.create({
-      data: {
-        id: uuidv4(),
-        image_url: data.image_url,
-        prompt: data.prompt,
-        artefactId: data.artefact,
-        sceneId: data.scene,
-      },
-    });
-    return mapGeneration(created);
-  },
-
-  getAllGenerations: async (): Promise<Generation[]> => {
-    const generations = await prisma.generation.findMany();
-    return generations.map(mapGeneration);
   },
 };
