@@ -13,7 +13,6 @@ import {
   Embedding,
   EmbeddingId,
 } from "@arkology-studio/ontothesia-types/embedding";
-import { Generation } from "@arkology-studio/ontothesia-types/generation";
 
 // Because Prisma autogenerates an ID by default, we can use Omit<*, "id"> when creating new records.
 // For update methods, we accept a Partial of the entity so you can update any subset of fields.
@@ -58,8 +57,4 @@ export interface DBService {
   getEmbeddingByArtefactId(artefactId: ArtefactId): Promise<Embedding | null>;
 
   // ───────────────────────────────────────────────────────────────────
-  // GENERATION
-  // ───────────────────────────────────────────────────────────────────
-  createGeneration(data: Omit<Generation, "id">): Promise<Generation>;
-  getAllGenerations(): Promise<Generation[]>;
 }
