@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "postinstall": "prisma generate",
-    "build": "prisma generate && next build",
+    "prisma-path": "node scripts/prisma-schema.js",
+    "postinstall": "prisma generate --schema=$(node scripts/prisma-schema.js)",
+    "build": "prisma generate --schema=$(node scripts/prisma-schema.js) && next build",
     "db-seed": "tsx prisma/seed.ts",
-    "migrate-and-seed": "prisma migrate deploy && prisma db seed",
+    "migrate-and-seed": "prisma migrate deploy --schema=$(node scripts/prisma-schema.js) && prisma db seed",
     "create-embeddings": "NODE_NO_WARNINGS=1 tsx --tsconfig tsconfig.json scripts/embeddings.ts",
     "create-scenes": "NODE_NO_WARNINGS=1 tsx --tsconfig tsconfig.json scripts/general.ts",
     "generate-experience-images": "NODE_NO_WARNINGS=1 tsx --tsconfig tsconfig.json scripts/generate-experience-images.ts",
@@ -19,7 +20,6 @@
     "seed:db": "bash scripts/seed-db.sh"
   },
   "prisma": {
-    "schema": "../packages/prisma/prisma/schema.prisma",
     "seed": "npm run db-seed"
   },
   "dependencies": {
