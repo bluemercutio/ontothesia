@@ -19,8 +19,8 @@ import { v4 as uuidv4 } from "uuid";
 
 import {
   RawArtefactWithEmbedding,
-  RawSceneWithGeneration,
   RawExperienceWithScenes,
+  RawScene,
   RawEmbedding,
 } from "./raw"; // <-- adjust path as needed
 
@@ -40,7 +40,7 @@ function mapArtefact(raw: RawArtefactWithEmbedding): Artefact {
   };
 }
 
-function mapScene(raw: RawSceneWithGeneration): Scene {
+function mapScene(raw: RawScene): Scene {
   return {
     id: raw.id,
     title: raw.title,
@@ -149,7 +149,6 @@ export const dbService: DBService = {
         artefactId,
         experienceId,
       },
-      include: { generation: true },
     });
     return mapScene(created);
   },
@@ -157,15 +156,12 @@ export const dbService: DBService = {
   getSceneById: async (id: SceneId): Promise<Scene | null> => {
     const scene = await prisma.scene.findUnique({
       where: { id },
-      include: { generation: true },
     });
     return scene ? mapScene(scene) : null;
   },
 
   getAllScenes: async (): Promise<Scene[]> => {
-    const scenes = await prisma.scene.findMany({
-      include: { generation: true },
-    });
+    const scenes = await prisma.scene.findMany({});
     return scenes.map(mapScene);
   },
 
@@ -178,7 +174,6 @@ export const dbService: DBService = {
         ...(artefactId && { artefactId }),
         ...(experienceId && { experienceId }),
       },
-      include: { generation: true },
     });
     return mapScene(updated);
   },
@@ -186,7 +181,6 @@ export const dbService: DBService = {
   deleteScene: async (id: SceneId): Promise<Scene> => {
     const deleted = await prisma.scene.delete({
       where: { id },
-      include: { generation: true },
     });
     return mapScene(deleted);
   },

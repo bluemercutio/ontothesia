@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
-import { useGetExperienceByIdQuery, useGetGenerationsQuery } from "@/store/api";
+import { useGetExperienceByIdQuery } from "@/store/api";
 import { useParams } from "next/navigation";
 import DomeScene from "@/components/Dome";
 import { useGetScenesQuery } from "@/store/api";
@@ -23,7 +23,7 @@ export default function ExperiencePage() {
     error: errorExperience,
   } = useGetExperienceByIdQuery(id);
   const allScenes = useGetScenesQuery();
-  const allGenerations = useGetGenerationsQuery();
+
   const [experienceScenes, setExperienceScenes] = useState<Scene[]>([]);
   const [isProcessing, setIsProcessing] = useState(true);
   const [processedScenes, setProcessedScenes] = useState<EnhancedScene[]>([]);
@@ -111,10 +111,6 @@ export default function ExperiencePage() {
       });
     };
   }, [experienceScenes]);
-
-  if (!allGenerations.data || allGenerations.isLoading) {
-    return <LoadingState />;
-  }
 
   console.log("All scenes", allScenes.data);
 
