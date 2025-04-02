@@ -30,6 +30,8 @@ export type RawExperienceWithScenes = {
   description: string;
   image_url: string;
   visible: boolean;
+  display_index: number;
+  complete: boolean;
   scenes: Array<{
     id: string;
     title: string;

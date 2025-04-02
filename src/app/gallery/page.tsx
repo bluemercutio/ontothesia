@@ -50,7 +50,11 @@ export default function Gallery() {
           };
         })
       );
-      setVisibleExperiences(processed);
+      // Sort experiences by display_index in ascending order
+      const sorted = processed.sort(
+        (a, b) => a.display_index - b.display_index
+      );
+      setVisibleExperiences(sorted);
     };
 
     if (experiences) {
@@ -69,20 +73,20 @@ export default function Gallery() {
               <div
                 className="animate-pulse w-64 h-80 rounded-lg"
                 style={{ backgroundColor: "var(--primary-bg)" }}
-              ></div>
+              />
             </div>
             <div className="min-h-screen pt-24">
               <div
                 className="w-48 h-8 rounded mx-auto mb-8"
                 style={{ backgroundColor: "var(--colour)" }}
-              ></div>
+              />
               <div className="flex flex-wrap justify-center gap-6">
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
                     className="animate-pulse w-64 h-80 rounded-lg"
                     style={{ backgroundColor: "var(--primary-bg)" }}
-                  ></div>
+                  />
                 ))}
               </div>
             </div>
@@ -154,13 +158,19 @@ export default function Gallery() {
                   <div
                     key={`flex-${item.id}`}
                     className="px-5 cursor-pointer"
-                    onClick={() => router.push(`/gallery/${item.id}`)}
+                    onClick={() =>
+                      router.push(
+                        `/gallery/${item.id}?imageUrl=${encodeURIComponent(
+                          item.processedImageUrl
+                        )}`
+                      )
+                    }
                   >
                     <Card
                       title={item.title}
                       description={item.description}
                       imageUrl={item.processedImageUrl}
-                      width="w-32"
+                      width="w-48"
                       height="h-48"
                     />
                   </div>

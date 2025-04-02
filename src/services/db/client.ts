@@ -61,6 +61,8 @@ function mapExperience(raw: RawExperienceWithScenes): Experience {
     visible: raw.visible,
     image_url: raw.image_url,
     scenes: raw.scenes.map((scene) => scene.id),
+    display_index: raw.display_index,
+    complete: raw.complete,
   };
 }
 
@@ -137,12 +139,7 @@ export const dbService: DBService = {
   // SCENE
   // ───────────────────────────────────────────────────────────────────
   createScene: async (data: Scene): Promise<Scene> => {
-    const {
-      artefact: artefactId,
-      experience: experienceId,
-
-      ...rest
-    } = data;
+    const { artefact: artefactId, experience: experienceId, ...rest } = data;
     const created = await prisma.scene.create({
       data: {
         ...rest,
