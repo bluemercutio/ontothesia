@@ -7,6 +7,14 @@
   --background: #171717;
   --primary-bg: #f5f5f7;
   --primary-bg-hover: #e5e5e7;
+  --text-on-primary: #000000;
+  
+  /* Artefact component colors */
+  --border-light: #e5e5e5;
+  --border-medium: #d1d1d1;
+  --text-light: #606060;
+  --text-medium: #505050;
+  --text-dark: #404040;
   
   /* Scrollbar colors */
   --scrollbar-thumb: #a0a0a0;
@@ -17,9 +25,17 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #000000;
-    --foreground: #ededed;
-    --primary-bg: #1c1c1e;
+    --foreground: #ffffff;
+    --primary-bg: #2c2c2e;
     --primary-bg-hover: #414149;
+    --text-on-primary: #ffffff;
+    
+    /* Artefact component colors */
+    --border-light: #3a3a3c;
+    --border-medium: #2c2c2e;
+    --text-light: #d1d1d6;
+    --text-medium: #aeaeb2;
+    --text-dark: #8e8e93;
     
     /* Dark mode scrollbar colors */
     --scrollbar-thumb: #4a4a4a;

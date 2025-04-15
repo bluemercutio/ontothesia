@@ -47,12 +47,14 @@ export default function Gallery() {
           return {
             ...exp,
             processedImageUrl: apiUrl,
-          };
+          } as EnhancedExperience; // Type assertion to satisfy TypeScript
         })
       );
+
       // Sort experiences by display_index in ascending order
       const sorted = processed.sort(
-        (a, b) => a.display_index - b.display_index
+        (a, b) =>
+          (a as Experience).display_index - (b as Experience).display_index
       );
       setVisibleExperiences(sorted);
     };

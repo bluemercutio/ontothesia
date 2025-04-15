@@ -8,13 +8,13 @@ import { projectInfo } from "./copyWrite";
 export default function Project() {
   return (
     <div className="min-h-screen flex flex-col ">
-      <main className="flex-1 container mx-auto flex flex-col items-center bg-[var(--background)] border-white border-[0.5px] w-1/2 pb-32">
+      <main className="flex-1 container mx-auto flex flex-col items-center bg-[var(--background)] border-[var(--foreground)] border-[0.5px] w-1/2 pb-32">
         <section className="w-full text-center">
-          <h1 className="text-4xl bg-black text-white mx-auto flex items-center justify-center h-64">
+          <h1 className="text-4xl bg-black text-[var(--foreground)] mx-auto flex items-center justify-center h-64">
             ONTOTHESIA
           </h1>
           <div className="relative">
-            <div className="flex justify-center items-center text-xl text-white-300 pb-2 pt-8 bg-[var(--primary-bg)]">
+            <div className="flex justify-center items-center text-xl text-[var(--text-on-primary)] pb-2 pt-8 bg-[var(--primary-bg)]">
               <div className="w-1/2 text-center">
                 <i>Ontology</i>
               </div>
@@ -26,9 +26,9 @@ export default function Project() {
               </div>
             </div>
             <div className="w-full flex flex-col md:flex-row mb-0 justify-center">
-              <div className="w-full pt-6 pb-8 bg-[var(--primary-bg)] text-white flex">
+              <div className="w-full pt-6 pb-8 bg-[var(--primary-bg)] text-[var(--text-on-primary)] flex">
                 <p
-                  className="text-white-300 text-justify px-16"
+                  className="text-[var(--text-on-primary)] text-justify px-16"
                   style={{ textAlignLast: "center" }}
                 >
                   The philosophical study of the nature of being, existence, and
@@ -36,9 +36,9 @@ export default function Project() {
                   and how entities are organized and related to one another.
                 </p>
               </div>
-              <div className="w-full pt-6 pb-8 bg-[var(--primary-bg)] text-white flex">
+              <div className="w-full pt-6 pb-8 bg-[var(--primary-bg)] text-[var(--text-on-primary)] flex">
                 <p
-                  className="text-black-300 text-justify px-16"
+                  className="text-[var(--text-on-primary)] text-justify px-16"
                   style={{ textAlignLast: "center" }}
                 >
                   A perceptual phenomenon where stimulation of one sensory or
@@ -47,7 +47,7 @@ export default function Project() {
                 </p>
               </div>
             </div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--primary-bg)] rounded-full w-12 h-12 flex items-center justify-center text-xl z-10">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--primary-bg)] rounded-full w-12 h-12 flex items-center justify-center text-xl z-10 text-[var(--text-on-primary)]">
               <span>+</span>
             </div>
           </div>
