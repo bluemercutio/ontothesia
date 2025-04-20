@@ -65,7 +65,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
-          stroke="var(--foreground)"
+          stroke="var(--text-on-primary)"
           className="w-6 h-6"
         >
           <path
@@ -86,7 +86,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
-          stroke="var(--foreground)"
+          stroke="var(--text-on-primary)"
           className="w-6 h-6"
         >
           <path
@@ -103,7 +103,7 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
             onClick={() => setCurrentIndex(index)}
             className={`w-3 h-3 rounded-full transition-all ${
               currentIndex === index
-                ? "bg-[var(--foreground)] scale-110"
+                ? "bg-[var(--text-on-primary)] scale-110"
                 : "bg-[var(--primary-bg)] hover:bg-[var(--primary-bg-hover)]"
             }`}
             aria-label={`Go to slide ${index + 1}`}

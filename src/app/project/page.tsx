@@ -7,7 +7,7 @@ import { projectInfo } from "./copyWrite";
 
 export default function Project() {
   return (
-    <div className="min-h-screen flex flex-col ">
+    <div className="min-h-screen flex flex-col">
       <main className="flex-1 container mx-auto flex flex-col items-center bg-[var(--background)] border-[var(--foreground)] border-[0.5px] w-1/2 pb-32">
         <section className="w-full text-center">
           <h1 className="text-4xl bg-black text-[var(--foreground)] mx-auto flex items-center justify-center h-64">

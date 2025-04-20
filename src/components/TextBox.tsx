@@ -13,7 +13,7 @@ const TextBox: React.FC<TextBoxProps> = ({ title, content }) => {
           {title}
         </h2>
       )}
-      <div className="prose prose-slate max-w-none">
+      <div className="prose max-w-none">
         <p className="text-[var(--foreground)] leading-relaxed text-justify">
           {content}
         </p>

@@ -26,7 +26,6 @@ const Card: React.FC<CardProps> = ({
       className={`relative ${width || "w-64"} ${
         height || "h-80"
       } overflow-hidden transition-transform duration-300 hover:scale-105 flex flex-col`}
-      style={{ background: "var(none)" }}
     >
       {imageUrl && (
         <div className="w-full aspect-square relative">
@@ -40,9 +39,11 @@ const Card: React.FC<CardProps> = ({
           />
         </div>
       )}
-      <div className=" flex-1 flex flex-col">
-        {title && <h3 className="text-lg ">{title}</h3>}
-        {text && <p className="text-white text-sm mt-5 ">{text}</p>}
+      <div className="flex-1 flex flex-col">
+        {title && <h3 className="text-lg text-[var(--foreground)]">{title}</h3>}
+        {text && (
+          <p className="text-[var(--foreground)] text-sm mt-5">{text}</p>
+        )}
 
         {component && <div className="mt-2">{component}</div>}
       </div>
