@@ -30,8 +30,12 @@ export default function GalleryOptions() {
         <div className="flex flex-row gap-12 justify-center pt-20">
           {/* Left side description */}
           <div className="flex-1 max-w-md">
-            <h1 className="text-2xl font-bold mb-4">{experience.title}</h1>
-            <p className="text-lg pb-10">{experience.description}</p>
+            <h1 className="text-2xl font-bold mb-4 text-[var(--foreground)]">
+              {experience.title}
+            </h1>
+            <p className="text-lg pb-10 text-[var(--foreground)]">
+              {experience.description}
+            </p>
             <Card imageUrl={imageUrl} width="w-96" height="h-96" />
           </div>
 
@@ -44,7 +48,7 @@ export default function GalleryOptions() {
               component={
                 <div className="flex flex-col gap-4">
                   <button
-                    className="bg-[var(--primary-bg)] text-onSecondary px-4 py-2 rounded-md w-full"
+                    className="bg-[var(--primary-bg)] text-[var(--text-on-primary)] px-4 py-2 rounded-md w-full hover:bg-[var(--primary-bg-hover)]"
                     onClick={() => router.push(`/gallery/${id}/dome`)}
                   >
                     Enter
@@ -60,7 +64,7 @@ export default function GalleryOptions() {
               component={
                 <div className="flex flex-col gap-4">
                   <button
-                    className="bg-[var(--primary-bg)] text-onSecondary px-4 py-2 rounded-md w-full"
+                    className="bg-[var(--primary-bg)] text-[var(--text-on-primary)] px-4 py-2 rounded-md w-full hover:bg-[var(--primary-bg-hover)]"
                     onClick={() => router.push(`/gallery/${id}/network`)}
                   >
                     Enter

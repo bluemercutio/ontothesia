@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${kanit.variable}`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${kanit.variable}`}
     >
       <body>
         <Providers>

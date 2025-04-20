@@ -3,45 +3,24 @@
 @tailwind utilities;
 
 :root {
+  /* Dark theme colors always applied */
+  --background: #000000;
   --foreground: #ffffff;
-  --background: #171717;
-  --primary-bg: #f5f5f7;
-  --primary-bg-hover: #e5e5e7;
-  --text-on-primary: #000000;
+  --primary-bg: #2c2c2e;
+  --primary-bg-hover: #414149;
+  --text-on-primary: #ffffff;
   
   /* Artefact component colors */
-  --border-light: #e5e5e5;
-  --border-medium: #d1d1d1;
-  --text-light: #606060;
-  --text-medium: #505050;
-  --text-dark: #404040;
+  --border-light: #3a3a3c;
+  --border-medium: #2c2c2e;
+  --text-light: #d1d1d6;
+  --text-medium: #aeaeb2;
+  --text-dark: #8e8e93;
   
   /* Scrollbar colors */
-  --scrollbar-thumb: #a0a0a0;
-  --scrollbar-thumb-hover: #808080;
-  --scrollbar-track: rgba(0, 0, 0, 0.05);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --foreground: #ffffff;
-    --primary-bg: #2c2c2e;
-    --primary-bg-hover: #414149;
-    --text-on-primary: #ffffff;
-    
-    /* Artefact component colors */
-    --border-light: #3a3a3c;
-    --border-medium: #2c2c2e;
-    --text-light: #d1d1d6;
-    --text-medium: #aeaeb2;
-    --text-dark: #8e8e93;
-    
-    /* Dark mode scrollbar colors */
-    --scrollbar-thumb: #4a4a4a;
-    --scrollbar-thumb-hover: #5a5a5a;
-    --scrollbar-track: rgba(255, 255, 255, 0.05);
-  }
+  --scrollbar-thumb: #4a4a4a;
+  --scrollbar-thumb-hover: #5a5a5a;
+  --scrollbar-track: rgba(255, 255, 255, 0.05);
 }
 
 body {
