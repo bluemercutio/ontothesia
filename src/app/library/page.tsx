@@ -29,6 +29,7 @@ export default function Library() {
             <div
               key={artefact.id}
               onClick={() => router.push(`/library/${artefact.id}`)}
+              className="cursor-pointer"
             >
               <Card
                 key={artefact.id}
